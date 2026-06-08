@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دانلود منجر حامد - پاپ‌آپ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            width: 350px;
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            direction: rtl;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 12px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            margin-left: 8px;
+        }
+        
+        .status-indicator.connected {
+            background: #4CAF50;
+            box-shadow: 0 0 8px #4CAF50;
+        }
+        
+        .status-indicator.disconnected {
+            background: #f44336;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .btn-success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #45a049;
+        }
+        
+        .quick-actions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .quick-actions h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: scale(1.05);
+        }
+        
+        .action-btn .icon {
+            font-size: 20px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .stats {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+        
+        .stat-label {
+            color: #666;
+        }
+        
+        .stat-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .footer {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 12px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        .notification.warning {
+            background: #ff9800;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 دانلود منجر حامد</h1>
+            <p>مدیریت حرفه‌ای دانلودها</p>
+        </div>
+        
+        <div class="status" id="statusBox">
+            <span id="statusText">در حال بررسی اتصال...</span>
+            <div class="status-indicator" id="statusIndicator"></div>
+        </div>
+        
+        <button class="btn btn-primary" id="btnOpenApp">
+            <span>📱</span>
+            باز کردن برنامه اصلی
+        </button>
+        
+        <button class="btn btn-secondary" id="btnAddLink">
+            <span>➕</span>
+            افزودن لینک جدید
+        </button>
+        
+        <button class="btn btn-success" id="btnDetectLinks">
+            <span>🔍</span>
+            تشخیص لینک‌های صفحه
+        </button>
+        
+        <div class="quick-actions">
+            <h3>اقدامات سریع</h3>
+            <div class="action-grid">
+                <div class="action-btn" data-action="clipboard">
+                    <span class="icon">📋</span>
+                    کلیپ‌بورد
+                </div>
+                <div class="action-btn" data-action="history">
+                    <span class="icon">📜</span>
+                    تاریخچه
+                </div>
+                <div class="action-btn" data-action="settings">
+                    <span class="icon">⚙️</span>
+                    تنظیمات
+                </div>
+                <div class="action-btn" data-action="help">
+                    <span class="icon">❓</span>
+                    راهنما
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats" id="statsBox" style="display: none;">
+            <div class="stat-item">
+                <span class="stat-label">دانلودهای فعال:</span>
+                <span class="stat-value" id="activeDownloads">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">سرعت کل:</span>
+                <span class="stat-value" id="totalSpeed">0 KB/s</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">تکمیل شده:</span>
+                <span class="stat-value" id="completedDownloads">0</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            نسخه 2.0.0 | توسعه یافته با ❤️
+        </div>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>

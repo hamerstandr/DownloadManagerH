@@ -174,7 +174,19 @@ namespace DownloadManagerH.Windows
                 txtWeeklyTime.Text = group.WeeklyTime;
                 dpDate.SelectedDate = group.ScheduleDate;
                 txtDateTimeTime.Text = group.ScheduleDateTimeTime;
-                // TODO: set weekly days toggle state
+                // Set weekly days toggle state
+                if (panelWeekly.Visibility == Visibility.Visible || group.WeeklyDays != null)
+                {
+                    var stackPanel = (StackPanel)panelWeekly.Children[1];
+                    foreach (var child in stackPanel.Children)
+                    {
+                        if (child is ToggleButton btn)
+                        {
+                            var dayName = btn.Content?.ToString();
+                            btn.IsChecked = group.WeeklyDays.Contains(dayName);
+                        }
+                    }
+                }
                 lstGroupDownloads.ItemsSource = group.Downloads;
                 ApplyScheduleUI(group);
             }
@@ -325,11 +337,28 @@ namespace DownloadManagerH.Windows
         }
         private void BtnStartQueue_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Logic to start group queue
+            // شروع صف دانلود گروه
+            if (lstGroups.SelectedItem is DownloadGroup activeGroup)
+            {
+                foreach (var download in activeGroup.Downloads.Where(d => d.Status == "Paused" || d.Status == "Stopped"))
+                {
+                    manager.StartDownload(download);
+                }
+                CustomMessageBox.ShowMessageBox($"شروع دانلودهای گروه '{activeGroup.Name}'", "شروع صف", CustomMessageBoxType.OK);
+            }
         }
+        
         private void BtnPauseQueue_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Logic to pause group queue
+            // توقف صف دانلود گروه
+            if (lstGroups.SelectedItem is DownloadGroup activeGroup)
+            {
+                foreach (var download in activeGroup.Downloads.Where(d => d.Status == "Downloading"))
+                {
+                    manager.PauseDownload(download);
+                }
+                CustomMessageBox.ShowMessageBox($"توقف دانلودهای گروه '{activeGroup.Name}'", "توقف صف", CustomMessageBoxType.OK);
+            }
         }
     }
 } 
