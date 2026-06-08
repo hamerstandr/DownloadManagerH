@@ -113,4 +113,14 @@ DownloadMenger2/
 **توسعه‌دهنده اصلی:** Hamid Estandi  
 **وب‌سایت:** [hamerstandr.github.io](https://github.com/hamerstandr)
 
+---
+
+## 📚 مستندات تکمیلی
+
+برای اطلاعات بیشتر، مستندات زیر را مطالعه کنید:
+
+- **[راهنمای یکپارچه‌سازی با TrafficWatch](docs/TRAFFIC_WATCH_INTEGRATION.md)** - راهنمای کامل اتصال به داشبورد مانیتورینگ
+- **[راهنمای افزونه‌های مرورگر](docs/EXTENSIONS_GUIDE.md)** - نصب و پیکربندی افزونه‌های Chrome، Edge و Firefox
+- **[راهنمای توسعه افزونه‌های داشبورد](docs/ADDON_DEVELOPMENT_GUIDE.md)** - آموزش ایجاد افزونه‌های جدید برای TrafficWatch
+
 </div>

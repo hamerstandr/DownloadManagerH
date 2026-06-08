@@ -1,3 +1,5 @@
-(docs/EXTENSIONS_GUIDE.md, docs/TRAFFIC_WATCH_INTEGRATION.md, README.md) are source/config files, no build artifacts, dependencies, or temp files detected. 
+(docs/ADDON_DEVELOPMENT_GUIDE.md and README.md are documentation/source files, no build artifacts, dependencies, or temp files in the changes)
 
-Output: (empty — output nothing)
+```markdown
+
+```
