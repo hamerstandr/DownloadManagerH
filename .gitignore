@@ -1,15 +1,16 @@
 ```
-# Browser extensions
-DownloadManagerH/DownloadManager/Extensions/Firefox/*.js
-DownloadManagerH/DownloadManager/Extensions/Firefox/*.html
-DownloadManagerH/DownloadManager/Extensions/Firefox/*.css
-DownloadManagerH/DownloadManager/Extensions/Firefox/*.json
-DownloadManagerH/DownloadManager/Extensions/Firefox/manifest.json
-DownloadManagerH/DownloadManager/Extensions/Firefox/dist/
-DownloadManagerH/DownloadManager/Extensions/Firefox/build/
-DownloadManagerH/DownloadManager/Extensions/Firefox/node_modules/
-DownloadManagerH/DownloadManager/Extensions/Firefox/.env
-DownloadManagerH/DownloadManager/Extensions/Firefox/.env.local
-DownloadManagerH/DownloadManager/Extensions/Firefox/.vscode/
-DownloadManagerH/DownloadManager/Extensions/Firefox/.idea/
+# Compressed files
+*.zip
+*.crx
+
+# Dependencies
+node_modules/
+
+# Editors
+.vscode/
+
+# Environment
+.env
+.env.local
+*.env.*
 ```

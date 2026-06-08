@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیمات افزونه دانلود منجر حامد</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 30px;
+            direction: rtl;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title .icon {
+            font-size: 24px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .setting-item:hover {
+            background: #f0f0f0;
+        }
+        
+        .setting-label {
+            flex: 1;
+        }
+        
+        .setting-label h3 {
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .setting-label p {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .number-input {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .notification.success {
+            background: #4CAF50;
+        }
+        
+        .notification.error {
+            background: #f44336;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ تنظیمات افزونه دانلود منجر حامد</h1>
+            <p>تنظیمات افزونه مرورگر Firefox را سفارشی کنید</p>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🔔</span>
+                اعلان‌ها و اطلاع‌رسانی
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <h3>نمایش اعلان‌ها</h3>
+                    <p>نمایش پیام‌های اطلاع‌رسانی هنگام ارسال لینک به دانلود منجر</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="showNotifications" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🔍</span>
+                تشخیص خودکار
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <h3>تشخیص خودکار دانلودها</h3>
+                    <p>شناسایی خودکار لینک‌های قابل دانلود در صفحات وب</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="autoDetectDownloads" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <h3>فعال‌سازی دکمه شناور دانلود</h3>
+                    <p>نمایش دکمه دانلود هنگام قرار دادن موس روی لینک‌ها</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="enableHoverButton" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">📦</span>
+                دانلود دسته‌ای
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <h3>فعال‌سازی دانلود دسته‌ای</h3>
+                    <p>امکان ارسال چندین لینک به صورت همزمان به دانلود منجر</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="batchDownloadEnabled" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <h3>حداکثر تعداد لینک در دانلود دسته‌ای</h3>
+                    <p>حداکثر تعداد لینک‌هایی که می‌توانید همزمان ارسال کنید</p>
+                    <input type="number" id="maxBatchSize" class="input-field number-input" value="50" min="1" max="100">
+                    <p class="help-text">مقدار بین 1 تا 100</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
+                <span class="icon">🌐</span>
+                اتصال به برنامه
+            </div>
+            
+            <div class="setting-item">
+                <div class="setting-label">
+                    <h3>آدرس API دانلود منجر</h3>
+                    <p>آدرس سرور محلی دانلود منجر حامد</p>
+                    <input type="text" id="apiBaseUrl" class="input-field" value="http://127.0.0.1:24680" dir="ltr">
+                    <p class="help-text">پیش‌فرض: http://127.0.0.1:24680</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" id="btnSave">💾 ذخیره تنظیمات</button>
+            <button class="btn btn-secondary" id="btnReset">🔄 بازگردانی به پیش‌فرض</button>
+            <button class="btn btn-secondary" id="btnHelp">❓ راهنما</button>
+        </div>
+    </div>
+    
+    <script src="options.js"></script>
+</body>
+</html>
