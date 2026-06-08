@@ -1,0 +1,95 @@
+<Window x:Class="DownloadManagerH.Windows.Dialog.InputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ورودی" Height="430" Width="520" 
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Window.ToolTip>
+        افزودن دانلود جدید
+    </Window.ToolTip>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="0">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="18" Height="18" Source="{StaticResource SmileyIcon}"/>
+                        <TextBlock Text="اطلاعات دانلود" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.ToolTip>اطلاعات دانلود</TabItem.ToolTip>
+                <StackPanel Margin="20">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Image Width="16" Height="16" Source="{StaticResource LinkIcon }"/>
+                        <TextBlock Text="آدرس لینک" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtUrl" Width="340" Margin="10,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Image Width="16" Height="16" Source="{StaticResource FileIcon}"/>
+                        <TextBlock Text="نام فایل" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtFileName" Width="340" Margin="10,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Image Width="16" Height="16" Source="{StaticResource FolderIcon}"/>
+                        <TextBlock Text="مسیر ذخیره" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtSavePath" Width="240" Margin="10,0"/>
+                        <Button ToolTip="انتخاب مسیر" Width="40" Height="28" Click="BtnBrowse_Click">
+                            <Viewbox Width="24" Height="24">
+                                <Canvas Width="24" Height="24">
+                                    <Path Data="M18,21H6c-1.657,0-3-1.343-3-3V6c0-1.657,1.343-3,3-3h12c1.657,0,3,1.343,3,3v12C21,19.657,19.657,21,18,21z" Opacity=".35" Fill="#5B5B5B" />
+                                    <Path Data="M17,14c-0.552,0-1-0.447-1-1V8h-5c-0.552,0-1-0.447-1-1s0.448-1,1-1h6c0.552,0,1,0.447,1,1v6C18,13.553,17.552,14,17,14z" Fill="#5B5B5B" />
+                                    <Path Data="M10,15c-0.256,0-0.512-0.098-0.707-0.293c-0.391-0.391-0.391-1.023,0-1.414l7-7c0.391-0.391,1.023-0.391,1.414,0s0.391,1.023,0,1.414l-7,7C10.512,14.902,10.256,15,10,15z" Fill="#5B5B5B" />
+                                </Canvas>
+                            </Viewbox>
+                        </Button>
+
+                    </StackPanel>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <Image Width="16" Height="16" Source="{StaticResource GroupIcon}"/>
+                            <TextBlock Text="انتخاب گروه" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbGroup" Width="200" Margin="10,0"/>
+                            <Button ToolTip="افزودن گروه جدید" Width="40" Height="28" Click="BtnAddGroup_Click">
+                                <Image Width="16" Height="16" Source="{StaticResource PlusIcon}"/>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
+            <!--<TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="18" Height="18" Source="{StaticResource SettingsIcon}"/>
+                        <TextBlock Text="تنظیمات" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.ToolTip>تنظیمات</TabItem.ToolTip>
+                <StackPanel Margin="20">
+                    <TextBlock Text="(در آینده)" Foreground="#888" FontStyle="Italic"/>
+                </StackPanel>
+            </TabItem>-->
+        </TabControl>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button ToolTip="شروع دانلود" Width="100" Margin="0,0,10,0" Click="BtnStart_Click" Foreground="White">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="20" Height="20" Source="{StaticResource PlayIcon}"/>
+                    <TextBlock Text="شروع" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+            <Button ToolTip="ذخیره برای بعد" Width="100" Margin="0,0,10,0" Click="BtnSave_Click" Background="#ff9800" Foreground="White">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="20" Height="20" Source="{StaticResource SaveIcon}"/>
+                    <TextBlock Text="بعداً" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+            <Button ToolTip="انصراف" Width="100" Click="BtnCancel_Click" Background="#e57373" Foreground="White">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="20" Height="20" Source="{StaticResource CrossIcon}"/>
+                    <TextBlock Text="انصراف" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window> 

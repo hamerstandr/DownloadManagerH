@@ -1,0 +1,215 @@
+<Window x:Class="DownloadManagerH.Windows.GroupManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
+        xmlns:models="clr-namespace:DownloadManagerH.Models"
+        xmlns:windows="clr-namespace:DownloadManagerH.Windows"
+        xmlns:local1="clr-namespace:DownloadManagerH.Controls"
+        Title="مدیریت گروه‌ها" Height="500" Width="900" 
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+>
+    <Window.ToolTip>
+        مدیریت گروه‌ها
+    </Window.ToolTip>
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <!-- لیست گروه‌ها و دکمه افزودن -->
+        <StackPanel Grid.Column="0" Grid.RowSpan="2" Margin="0,0,10,0">
+            <Button ToolTip="افزودن گروه" Width="150" Height="40" Margin="0,0,0,10" Click="BtnAddGroup_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="20" Height="20" Source="{StaticResource PlusIcon}"/>
+                    <TextBlock Text="افزودن گروه" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+            <ListBox x:Name="lstGroups" Height="350" SelectionChanged="LstGroups_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Button ToolTip="حذف گروه" Width="60" Height="32" Margin="5,0,0,0" Click="BtnDeleteGroup_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Name}" Value="پیش‌فرض">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Image Width="16" Height="16" Source="{StaticResource CrossIcon}"/>
+                                    <!--<TextBlock Text="حذف" Margin="5,0,0,0"/>-->
+                                </StackPanel>
+                            </Button>
+                            <TextBlock Text="{Binding Name}" Foreground="{Binding Color}" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+        <!-- تب‌ها و محتوای گروه -->
+        <TabControl Grid.Column="1" Grid.Row="0" x:Name="tabGroupDetails">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="18" Height="18" Source="{StaticResource SettingsIcon}"/>
+                        <TextBlock Text="تنظیمات" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.ToolTip>
+                    تنظیمات
+                </TabItem.ToolTip>
+                <Border Background="#f5f5f5" CornerRadius="10" Padding="10" Margin="20">
+                    <StackPanel x:Name="panelGroupSettings">
+                        <!-- پیام هشدار برای گروه پیش‌فرض -->
+                        <Border x:Name="alertDefaultGroup" Visibility="Collapsed" Margin="0,0,0,10" CornerRadius="8" BorderThickness="0" 
+                                Background="#FF9800" Padding="12">
+                            <TextBlock Text="تنظیمات گروه پیش‌فرض را نمی‌توان تغییر داد." 
+                                       Foreground="White" FontWeight="Bold" FontSize="15" TextAlignment="Center"/>
+                        </Border>
+                        <!-- نام گروه -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="نام گروه:" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtGroupName" Width="150" Margin="10,0"/>
+                        </StackPanel>
+                        <!-- رنگ گروه -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="رنگ گروه:" VerticalAlignment="Center"/>
+                            <colorpicker:PortableColorPicker x:Name="txtGroupColor" Width="80" Margin="10,0"/>
+                        </StackPanel>
+                        <!-- زمان‌بندی -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <RadioButton x:Name="rbNoSchedule" Content="بدون زمان‌بندی" GroupName="ScheduleType" Margin="0,0,10,0"/>
+                            <RadioButton x:Name="rbStartup" Content="شروع با برنامه" GroupName="ScheduleType" Margin="0,0,10,0"/>
+                            <RadioButton x:Name="rbScheduleTime" ToolTip="تعیین زمان" GroupName="ScheduleType" Margin="0,0,10,0" Checked="ScheduleType_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Source="{StaticResource ClockIcon}"/>
+                                    <TextBlock Text="زمان خاص" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="rbScheduleWeekly" ToolTip="هفتگی (برای هر روز یک سوییچ و زمان)" GroupName="ScheduleType" Margin="0,0,10,0" Checked="ScheduleType_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Source="{StaticResource SevenIcon}"/>
+                                    <TextBlock Text="هفتگی" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </RadioButton>
+                            <RadioButton x:Name="rbScheduleDateTime" ToolTip="تعیین تاریخ و زمان" GroupName="ScheduleType" Margin="0,0,10,0" Checked="ScheduleType_Checked">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Source="{StaticResource CalendarIcon}"/>
+                                    <TextBlock Text="تاریخ و زمان" Margin="5,0,0,0"/>
+                                </StackPanel>
+                            </RadioButton>
+                        </StackPanel>
+                        <!-- زمان‌بندی: تعیین زمان -->
+                        <StackPanel x:Name="panelTime" Orientation="Horizontal" Margin="40,0,0,10" Visibility="Collapsed">
+                            <TextBlock Text="ساعت شروع:" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtTime" Width="80" Margin="10,0" ToolTip="فرمت: HH:mm"/>
+                        </StackPanel>
+                        <!-- زمان‌بندی: هفتگی -->
+                        <StackPanel x:Name="panelWeekly" Orientation="Horizontal" Margin="40,0,0,10" Visibility="Collapsed">
+                            <TextBlock Text="روزهای هفته:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <StackPanel Orientation="Horizontal" Margin="10,0">
+                                <ToggleButton Content="ش" ToolTip="شنبه" Width="32" Height="32" Margin="2,0"/>
+                                <ToggleButton Content="ی" ToolTip="یکشنبه" Width="32" Height="32" Margin="2,0"/>
+                                <ToggleButton Content="د" ToolTip="دوشنبه" Width="32" Height="32" Margin="2,0"/>
+                                <ToggleButton Content="س" ToolTip="سه‌شنبه" Width="32" Height="32" Margin="2,0"/>
+                                <ToggleButton Content="چ" ToolTip="چهارشنبه" Width="32" Height="32" Margin="2,0"/>
+                                <ToggleButton Content="پ" ToolTip="پنجشنبه" Width="32" Height="32" Margin="2,0"/>
+                                <ToggleButton Content="ج" ToolTip="جمعه" Width="32" Height="32" Margin="2,0"/>
+                            </StackPanel>
+                            <TextBlock Text="ساعت شروع:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox x:Name="txtWeeklyTime" Width="80" Margin="10,0" ToolTip="فرمت: HH:mm"/>
+                        </StackPanel>
+                        <!-- زمان‌بندی: تعیین تاریخ و زمان -->
+                        <StackPanel x:Name="panelDateTime" Orientation="Horizontal" Margin="40,0,0,10" Visibility="Collapsed">
+                            <TextBlock Text="تاریخ:" VerticalAlignment="Center"/>
+                            <DatePicker x:Name="dpDate" Width="120" Margin="10,0"/>
+                            <TextBlock Text="ساعت شروع:" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                            <TextBox x:Name="txtDateTimeTime" Width="80" Margin="10,0" ToolTip="فرمت: HH:mm"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="18" Height="18" Source="{StaticResource ListIcon}"/>
+                        <TextBlock Text="لیست دانلودها" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.ToolTip>
+                    لیست دانلودها
+                </TabItem.ToolTip>
+                <!-- محتوای لیست دانلودها -->
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="حداکثر دانلود همزمان:" VerticalAlignment="Center"/>
+                        <local1:NumericUpDown x:Name="numGroupConcurrent" Width="80" Margin="10,0" Min="1" Max="{x:Static models:Settings.MaxConcurrentDownloadsLimit}" Value="4"/>
+                    </StackPanel>
+                    <ListBox x:Name="lstGroupDownloads" Height="200">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
+                                    <Button ToolTip="بالا بردن اولویت" Width="100" Height="32" Margin="5,0,0,0" Click="BtnUpPriority_Click">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Image Width="14" Height="14" Source="{StaticResource CheckIcon}"/>
+                                            <TextBlock Text="بالا" Margin="5,0,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button ToolTip="پایین آوردن اولویت" Width="100" Height="32" Margin="5,0,0,0" Click="BtnDownPriority_Click">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Image Width="14" Height="14" Source="{StaticResource PauseIcon}"/>
+                                            <TextBlock Text="پایین" Margin="5,0,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button ToolTip="حذف دانلود از لیست" Width="60" Height="32" Margin="5,0,0,0" Click="BtnRemoveDownload_Click">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Image Width="14" Height="14" Source="{StaticResource CrossIcon}"/>
+                                            <TextBlock Text="حذف" Margin="5,0,0,0"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+        <!-- دکمه‌های پایین صفحه -->
+        <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button ToolTip="بستن پنجره" Width="100" Height="40" Margin="5,0,0,0" Click="BtnClose_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="16" Height="16" Source="{StaticResource CrossIcon}"/>
+                    <TextBlock Text="بستن" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+            <Button ToolTip="ذخیره تغییرات صف" Width="100" Height="40" Margin="5,0,0,0" Click="BtnSaveGroupSettings_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="16" Height="16" Source="{StaticResource SaveIcon}"/>
+                    <TextBlock Text="ذخیره" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+            <Button ToolTip="شروع صف" Width="100" Height="40" Margin="5,0,0,0" Click="BtnStartQueue_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="16" Height="16" Source="{StaticResource PlayIcon}"/>
+                    <TextBlock Text="شروع" Margin="5,0,0,0" Foreground="White"/>
+                </StackPanel>
+            </Button>
+            <Button ToolTip="توقف صف" Width="100" Height="40" Margin="5,0,0,0" Click="BtnPauseQueue_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="16" Height="16" Source="{StaticResource PauseIcon}"/>
+                    <TextBlock Text="توقف" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window> 

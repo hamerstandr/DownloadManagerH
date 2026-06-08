@@ -1,0 +1,9 @@
+{
+  "name": "com.hameddownloadmanager.host",
+  "description": "دانلود منجر حامد - Native Messaging Host",
+  "path": "C:\\Program Files\\DownloadManagerH\\DownloadManager.exe",
+  "type": "stdio",
+  "allowed_origins": [
+    "extension://your-edge-extension-id/"
+  ]
+}

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیمات افزونه دانلود منجر حامد</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            color: #333;
+            direction: rtl;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-right: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            margin: 0 0 20px 0;
+            color: #333;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .setting-description {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .setting-control {
+            margin-right: 20px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .number-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .number-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .select-input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .select-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #da190b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #0b7dda;
+            transform: translateY(-2px);
+        }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .status-message.show {
+            opacity: 1;
+        }
+        
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .connection-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+        
+        .connection-dot.connected {
+            background: #44ff44;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .advanced-section {
+            background: #fff8e1;
+            border-right-color: #ff9800;
+        }
+        
+        .warning-text {
+            color: #e65100;
+            font-size: 13px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 تنظیمات افزونه دانلود منجر حامد</h1>
+            <p>تنظیمات افزونه را برای بهترین تجربه شخصی‌سازی کنید</p>
+        </div>
+        
+        <div class="content">
+            <div class="connection-status">
+                <div class="connection-dot" id="connectionDot"></div>
+                <span id="connectionStatus">در حال بررسی اتصال...</span>
+            </div>
+            
+            <div class="section">
+                <h2>⚙️ تنظیمات عمومی</h2>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">نمایش اعلان‌ها</div>
+                        <div class="setting-description">نمایش اعلان‌های موفقیت و خطا هنگام ارسال لینک‌ها</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showNotifications" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">تشخیص خودکار لینک‌ها</div>
+                        <div class="setting-description">تشخیص و برجسته‌سازی خودکار لینک‌های قابل دانلود در صفحات</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="autoDetectDownloads" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">دانلود دسته‌ای</div>
+                        <div class="setting-description">امکان ارسال چندین لینک به صورت همزمان</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="batchDownloadEnabled" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">حداکثر تعداد لینک در دسته</div>
+                        <div class="setting-description">حداکثر تعداد لینک‌هایی که می‌توان در یک بار ارسال کرد</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="maxBatchSize" class="number-input" value="50" min="1" max="200">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔗 تنظیمات لینک</h2>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">تأخیر نمایش دکمه دانلود</div>
+                        <div class="setting-description">مدت زمان تأخیر برای نمایش دکمه دانلود هنگام هاور روی لینک‌ها (میلی‌ثانیه)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="hoverDelay" class="number-input" value="500" min="100" max="2000" step="100">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">نمایش اطلاعات فایل</div>
+                        <div class="setting-description">نمایش اطلاعات اضافی مانند اندازه و نوع فایل در منوهای زمینه‌ای</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="showFileInfo" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section advanced-section">
+                <h2>🔧 تنظیمات پیشرفته</h2>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">آدرس سرور</div>
+                        <div class="setting-description">آدرس IP سرور دانلود منجر حامد</div>
+                        <div class="warning-text">تغییر این تنظیم فقط در صورت نیاز خاص توصیه می‌شود</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" id="serverAddress" class="select-input" value="127.0.0.1" style="width: 150px;">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">پورت سرور</div>
+                        <div class="setting-description">شماره پورت سرور دانلود منجر حامد</div>
+                        <div class="warning-text">پورت پیش‌فرض 24680 است</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="serverPort" class="number-input" value="24680" min="1024" max="65535">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">تعداد تلاش مجدد</div>
+                        <div class="setting-description">تعداد دفعات تلاش مجدد در صورت شکست ارسال لینک</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="retryAttempts" class="number-input" value="3" min="1" max="10">
+                    </div>
+                </div>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-title">فاصله زمانی تلاش مجدد</div>
+                        <div class="setting-description">فاصله زمانی بین تلاش‌های مجدد (میلی‌ثانیه)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="retryDelay" class="number-input" value="1000" min="500" max="5000" step="500">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" id="saveSettings">💾 ذخیره تنظیمات</button>
+                <button class="btn btn-secondary" id="resetSettings">🔄 بازنشانی</button>
+                <button class="btn btn-info" id="testConnection">🔗 تست اتصال</button>
+            </div>
+            
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+    </div>
+    
+    <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+﻿<Window x:Class="DownloadManagerH.Windows.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DownloadManagerH.Windows"
+        mc:Ignorable="d"
+        Title="درباره برنامه" 
+        Height="400" 
+        Width="600"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Icon="/icons8_chevron_down2.ico">
+
+    <Grid Background="#FFE5E5E5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- هدر -->
+        <StackPanel Grid.Row="0" Background="#FF3F51B5" Margin="20">
+            <TextBlock Text="{Binding Title}" 
+                       FontSize="24" 
+                       Foreground="White"
+                       HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding Version}" 
+                       FontSize="16" 
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- محتوای اصلی -->
+        <ScrollViewer Grid.Row="1" Padding="20">
+            <StackPanel>
+                <TextBlock Text="{Binding Description}" 
+                           TextWrapping="Wrap"
+                           FontSize="16"
+                           Margin="0,0,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Text="توسعه‌دهنده:" Grid.Row="0" Grid.Column="0"
+                               FontWeight="Bold" Margin="0,0,10,10"/>
+                    <TextBlock Text="{Binding Author}" Grid.Row="0" Grid.Column="1"
+                               Margin="0,0,0,10"/>
+
+                    <TextBlock Text="شرکت:" Grid.Row="1" Grid.Column="0"
+                               FontWeight="Bold" Margin="0,0,10,10"/>
+                    <TextBlock Text="{Binding Company}" Grid.Row="1" Grid.Column="1"
+                               Margin="0,0,0,10"/>
+
+                    <TextBlock Text="کپی‌رایت:" Grid.Row="2" Grid.Column="0"
+                               FontWeight="Bold" Margin="0,0,10,10"/>
+                    <TextBlock Text="{Binding Copyright}" Grid.Row="2" Grid.Column="1"
+                               Margin="0,0,0,10"/>
+
+                    <TextBlock Text="وب‌سایت:" Grid.Row="3" Grid.Column="0"
+                               FontWeight="Bold" Margin="0,0,10,0"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1">
+                        <Hyperlink NavigateUri="https://www.hamedtech.ir" 
+                                   RequestNavigate="Hyperlink_RequestNavigate">
+                            www.hamedtech.ir
+                        </Hyperlink>
+                    </TextBlock>
+                </Grid>
+
+                <Image Source="/icons8_chevron_down2.ico" 
+                       Width="150"
+                       Height="150"
+                       HorizontalAlignment="Center"
+                       Margin="0,30,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- فوتر -->
+        <StackPanel Grid.Row="2" Background="#FFE0E0E0" Margin="10">
+            <Button Content="تأیید" 
+                    Width="100" 
+                    HorizontalAlignment="Center"
+                    Click="OkButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

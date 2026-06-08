@@ -1,0 +1,255 @@
+﻿<Window x:Class="DownloadManagerH.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DownloadManagerH.Windows"
+        xmlns:models="clr-namespace:DownloadManagerH.Models"
+        xmlns:controls="clr-namespace:DownloadManager.Controls"
+        mc:Ignorable="d"
+        Title="دانلود منجر حامد" Height="600" Width="900" Background="#f7f7fa" Icon="/icons8_chevron_down_480px.png" FlowDirection="RightToLeft">
+    <Window.Resources>
+        <!--<models:GroupColorConverter x:Key="GroupColorConverter"/>
+        <models:StatusColorConverter x:Key="StatusColorConverter"/>
+        <models:CompletedOnlyConverter x:Key="CompletedOnlyConverter" />-->
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" MinHeight="24"/>
+            <RowDefinition Height="Auto" MinHeight="48"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <!-- File Menu -->
+        <Menu Grid.Row="0" Margin="0,0,0,5">
+            <MenuItem Header="فایل">
+                <MenuItem Header="مدیریت گروه‌ها/صف‌ها" Click="MenuGroupManager_Click"/>
+                <Separator/>
+                <MenuItem Header="خروجی لیست دانلودها" Click="btnExport_Click"/>
+                <MenuItem Header="ورودی لیست دانلودها" Click="btnImport_Click"/>
+                <Separator/>
+                <MenuItem Header="خروج" Click="MenuExit_Click"/>
+            </MenuItem>
+        </Menu>
+        <!-- Toolbar -->
+        <ToolBar Grid.Row="1" Background="#e3e6f0" Padding="8" BorderThickness="0" Margin="0,0,0,0"  >
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="5,0" >
+                
+                <Button x:Name="btnAdd" ToolTip="افزودن دانلود جدید" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnAdd_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Source="{StaticResource PlusIcon}"/>
+                        <TextBlock Text="افزودن" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnRemove" ToolTip="حذف دانلود" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnRemove_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Source="{StaticResource CrossIcon}"/>
+                        <TextBlock Text="حذف" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnStart" ToolTip="شروع دانلود" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnStart_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Source="{StaticResource PlayIcon}"/>
+                        <TextBlock Text="شروع" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnPause" ToolTip="توقف موقت" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnPause_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Source="{StaticResource PauseIcon}"/>
+                        <TextBlock Text="توقف" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnResume" ToolTip="ادامه دانلود" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnResume_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Source="{StaticResource PlayIcon}"/>
+                        <TextBlock Text="ادامه" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnSettings" ToolTip="تنظیمات برنامه" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnSettings_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="18" Height="18" Source="{StaticResource SettingsIcon}"/>
+                        <TextBlock Text="تنظیمات" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnHelp" ToolTip="راهنمای برنامه" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnHelp_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="18" Height="18" Source="{StaticResource HelpIcon}"/>
+                        <TextBlock Text="راهنما" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="btnResourceTest" ToolTip="تست‌های عملکرد منابع" Style="{StaticResource ToolbarButtonStyle}" Margin="0,0,8,0" Click="btnResourceTest_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🧪" FontSize="16" Margin="2,0"/>
+                        <TextBlock Text="تست منابع" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </ToolBar>
+        <!-- Download List -->
+        <DataGrid x:Name="dgDownloads" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" Margin="0,10,0,0" RowHeight="40" HeadersVisibility="Column" CanUserAddRows="False" CanUserDeleteRows="False" AlternationCount="2" AlternatingRowBackground="#f5f5f5" RowBackground="White" 
+                  MouseDoubleClick="DgDownloads_MouseDoubleClick" KeyDown="DgDownloads_KeyDown"
+                  LoadingRow="DgDownloads_LoadingRow" ContextMenuOpening="DgDownloads_ContextMenuOpening" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="▶️ شروع" ToolTip="شروع دانلود" Name="menuStart" Click="btnStart_Click"/>
+                    <MenuItem Header="⏸️ توقف" ToolTip="توقف دانلود" Name="menuPause" Click="btnPause_Click"/>
+                    <MenuItem Header="▶️ ادامه" ToolTip="ادامه دانلود" Name="menuResume" Click="btnResume_Click"/>
+                    <MenuItem Header="❌ حذف" ToolTip="حذف دانلود" Name="menuRemove" Click="btnRemove_Click"/>
+                    <MenuItem Header="📂 باز کردن پوشه" ToolTip="باز کردن پوشه" Name="menuOpenFolder" Click="MenuOpenFolder_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
+                    <MenuItem Header="📄 باز کردن فایل" ToolTip="باز کردن فایل" Name="menuOpenFile" Click="MenuOpenFile_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
+                    <MenuItem Header="🗂️ باز کردن با..." ToolTip="باز کردن با..." Click="MenuOpenWith_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
+                    <MenuItem Header="📝 جزئیات" ToolTip="مشاهده جزئیات" Name="menuDetails" Click="MenuDetails_Click"/>
+                    <Separator/>
+                    <MenuItem Header="🗂️ تغییر گروه" ToolTip="تغییر گروه" ItemsSource="{Binding GroupMenuItems}">
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem">
+                                <Setter Property="Header" Value="{Binding DisplayName}"/>
+                                <Setter Property="ToolTip" Value="{Binding ToolTip}"/>
+                                <EventSetter Event="Click" Handler="MenuChangeGroup_Click"/>
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="🛠️ مدیریت گروه‌ها" ToolTip="مدیریت گروه‌ها" Click="MenuGroupManager_Click"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="نام فایل"  Width="180" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FileName}" VerticalAlignment="Center" Width="auto" Height="16"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="پیشرفت" Width="160">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <controls:ProgressBarWithText 
+                                Value="{Binding Progress}" 
+                                Maximum="100" 
+                                Height="18" 
+                                UseGradientColor="True"
+                                ShowPercentage="True"
+                                TextFontSize="10"
+                                Margin="2"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="کنترل" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <!-- دکمه یکپارچه شروع/توقف -->
+                                <Button Width="80" Height="38" Margin="2,0" Click="btnToggleDownload_Click"  Style="{DynamicResource btnstate}">
+                                    <!--<Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Background" Value="Green"/>
+                                            <Setter Property="ToolTip" Value="شروع دانلود"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Status}" Value="Downloading">
+                                                    <Setter Property="Background" Value="Orange"/>
+                                                    <Setter Property="ToolTip" Value="توقف دانلود"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Paused">
+                                                    <Setter Property="Background" Value="Green"/>
+                                                    <Setter Property="ToolTip" Value="ادامه دانلود"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                    <Setter Property="Background" Value="Gray"/>
+                                                    <Setter Property="ToolTip" Value="تکمیل شده"/>
+                                                    <Setter Property="IsEnabled" Value="False"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                    <Setter Property="Background" Value="Red"/>
+                                                    <Setter Property="ToolTip" Value="تلاش مجدد"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>-->
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Foreground="White" Margin="0">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="▶️"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Downloading">
+                                                            <Setter Property="Text" Value="⏸️"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Paused">
+                                                            <Setter Property="Text" Value="▶️"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                            <Setter Property="Text" Value="✅"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                            <Setter Property="Text" Value="🔄"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="سرعت" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Speed}" VerticalAlignment="Center" Width="auto" Height="16"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- ستون گروه با رنگ پس‌زمینه گروه -->
+                <DataGridTemplateColumn Header="گروه">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="8" Padding="4" Margin="2"
+                                    Background="{Binding Group, Converter={StaticResource GroupColorConverter}}">
+                                <TextBlock Text="{Binding Group}" Foreground="White" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- ستون وضعیت با رنگ پس‌زمینه بر اساس وضعیت -->
+                <DataGridTemplateColumn Header="وضعیت">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="8" Padding="4" Margin="2"
+                                    Background="{Binding StatusFa, Converter={StaticResource StatusColorConverter}}">
+                                <TextBlock Text="{Binding StatusFa}" Foreground="White" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <!-- StatusBar در پایین صفحه -->
+        <StatusBar Grid.Row="3" VerticalAlignment="Bottom" Background="#f5f5f5" Foreground="#333" FontWeight="Bold">
+            <StatusBarItem>
+                <StackPanel VerticalAlignment="Top" Orientation="Horizontal">
+                    <TextBlock Text="تعداد کل دانلودها: "/>
+                    <TextBlock Text="{Binding DownloadCount}"/>
+                </StackPanel>
+                
+            </StatusBarItem>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text=" | میانگین سرعت: "/>
+                    <TextBlock Text="{Binding AverageSpeed}"/>
+                    <TextBlock Text=" KB/s"/>
+                </StackPanel>
+                
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="© 2024 دانلود منجر حامد | طراحی شده با " Foreground="#888" FontWeight="Bold"/>
+                    <Image Width="20" Height="20" Source="{StaticResource HeartIcon}"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

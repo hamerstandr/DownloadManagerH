@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست ارتباط افزونه و برنامه دانلود منجر حامد</title>
+    <style>
+        body { font-family: Tahoma, sans-serif; background: #f7f7fa; color: #222; padding: 40px; }
+        input, button { font-size: 1.1em; padding: 6px 12px; margin: 8px 0; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>تست ارتباط افزونه و برنامه دانلود منجر حامد</h2>
+    <label for="url">لینک دانلود:</label>
+    <input type="text" id="url" size="60" value="https://example.com/file.zip" />
+    <button onclick="sendLink()">ارسال به برنامه</button>
+    <div id="result"></div>
+    <script>
+        function sendLink() {
+            var url = document.getElementById('url').value;
+            fetch('http://127.0.0.1:24680/add/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: url
+            })
+            .then(res => res.text().then(txt => {
+                document.getElementById('result').innerText = 'پاسخ: ' + txt;
+            }))
+            .catch(err => {
+                document.getElementById('result').innerText = 'خطا: ' + err.message;
+            });
+        }
+    </script>
+</body>
+</html> 

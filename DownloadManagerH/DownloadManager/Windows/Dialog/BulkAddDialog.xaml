@@ -1,0 +1,32 @@
+<Window x:Class="DownloadManagerH.Windows.Dialog.BulkAddDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="افزودن گروهی لینک‌ها" Height="500" Width="700" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <Button Content="انتخاب همه" Width="100" Margin="0,0,10,0" Click="BtnSelectAll_Click"/>
+            <Button Content="انتخاب نکردن همه" Width="120" Click="BtnDeselectAll_Click"/>
+        </StackPanel>
+        <DataGrid x:Name="dgLinks" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" SelectionMode="Extended">
+            <DataGrid.Columns>
+                <DataGridCheckBoxColumn Header="انتخاب" Binding="{Binding IsSelected, Mode=TwoWay}" Width="60"/>
+                <DataGridTextColumn Header="آدرس" Binding="{Binding Url}" Width="*"/>
+                <DataGridTextColumn Header="نوع فایل" Binding="{Binding FileType}" Width="100"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Bottom">
+            <TextBlock Text="گروه:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <ComboBox x:Name="cmbGroup" Width="150" Margin="0,0,10,0"/>
+            <Button Content="افزودن گروه" Width="100" Margin="0,0,10,0" Click="BtnAddGroup_Click"/>
+            <TextBlock Text="آدرس دانلود:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <TextBox x:Name="txtSavePath" Width="220" Margin="0,0,10,0"/>
+            <Button Content="تایید" Width="120" Background="#4caf50" Foreground="White" Click="BtnOk_Click"/>
+            <Button Content="انصراف" Width="100" Background="#e57373" Foreground="White" Click="BtnCancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window> 

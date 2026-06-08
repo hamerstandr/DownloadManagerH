@@ -1,0 +1,50 @@
+﻿<Window x:Class="DownloadManagerH.Windows.Dialog.CompletDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DownloadManagerH.Windows.Dialog"
+        mc:Ignorable="d"
+        Topmost="True"
+        
+        Title="اتمام" Height="390" Width="620" ResizeMode="NoResize" WindowStyle="ToolWindow">
+    <Grid>
+        <StackPanel Orientation="Vertical" Margin="10">
+            <StackPanel Orientation="Horizontal" Margin="10">
+                <TextBlock Text="📂آدرس فایل" ToolTip="آدرس فایل" FontSize="20" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBox x:Name="txtFilePath" IsReadOnly="True"  Width="454" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"  Margin="10">
+                <TextBlock Text="📄 نام فایل" ToolTip="نام فایل" FontSize="20" VerticalAlignment="Center"/>
+                <TextBox x:Name="txtFileName" IsReadOnly="True" Margin="10,0" MaxWidth="390"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"  Margin="10">
+                <TextBlock Text="🔗 آدرس" ToolTip="آدرس" FontSize="20" VerticalAlignment="Center"/>
+                <TextBox x:Name="txtUrl" Margin="29,0" IsReadOnly="True" MaxWidth="390"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"  Margin="10">
+                <TextBlock Text="📦 حجم کل" ToolTip="حجم کل" FontSize="20"/>
+                <TextBlock x:Name="txtTotalSize" Margin="10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="⬇️ حجم دانلود شده" ToolTip="حجم دانلود شده" FontSize="20" Margin="20,0,0,0"/>
+                <TextBlock x:Name="txtDownloadedSize" Margin="10,0" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" Margin="10">
+                <Button ToolTip="اجرا/بازکردن" Width="40" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnOpenFile_Click" IsEnabled="{Binding _item.Status, Converter={StaticResource CompletedOnlyConverter}}" Background="#FF41CA2E">
+                    <TextBlock Text="▶️" Foreground="White"/>
+                </Button>
+                <Button ToolTip="باز کردن با..." Width="40" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnOpenWith_Click" IsEnabled="{Binding _item.Status, Converter={StaticResource CompletedOnlyConverter}}">
+                    <TextBlock Text="🗂️" Foreground="White"/>
+                </Button>
+                <Button ToolTip="باز کردن پوشه" Width="40" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnOpenFolder_Click" IsEnabled="{Binding _item.Status, Converter={StaticResource CompletedOnlyConverter}}">
+                    <TextBlock Text="📂" Foreground="White"/>
+                </Button>
+                <Button ToolTip="بستن" Width="40" Height="40" Padding="0" Margin="5,0,0,0" Background="Red" Foreground="White" Click="Close_Click">
+                    <TextBlock Text="❌" Foreground="White"/>
+                </Button>
+            </StackPanel>
+        </StackPanel>
+        
+
+    </Grid>
+</Window>

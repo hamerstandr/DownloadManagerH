@@ -1,0 +1,144 @@
+<Window x:Class="DownloadManagerH.Windows.DownloadDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:DownloadManagerH.Windows"
+        xmlns:models="clr-namespace:DownloadManagerH.Models" xmlns:controls="clr-namespace:DownloadManager.Controls"
+        Title="جزئیات دانلود" Height="580" Width="600" 
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" FlowDirection="RightToLeft">
+    <Window.ToolTip>
+        جزئیات دانلود
+    </Window.ToolTip>
+    <Grid Margin="10">
+        <TabControl>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Width="20" Height="20" Source="{StaticResource StateIcon}"/>
+                        <TextBlock Text="وضعیت دانلود" Margin="5,0,0,0"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <TabItem.ToolTip>وضعیت دانلود</TabItem.ToolTip>
+                <StackPanel Margin="20">
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="📄 نام فایل" ToolTip="نام فایل" FontSize="20" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtFileName" IsReadOnly="True" Margin="10,0" MaxWidth="390"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="🔗 آدرس" ToolTip="آدرس" FontSize="20" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtUrl" Margin="29,0" IsReadOnly="True" MaxWidth="390"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="📦 حجم کل" ToolTip="حجم کل" FontSize="20"/>
+                        <TextBlock x:Name="txtTotalSize" Margin="10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="⬇️ حجم دانلود شده" ToolTip="حجم دانلود شده" FontSize="20" Margin="20,0,0,0"/>
+                        <TextBlock x:Name="txtDownloadedSize" Margin="10,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="⚡سرعت دانلود" ToolTip="سرعت دانلود" FontSize="20"/>
+                        <TextBlock x:Name="txtSpeed" Margin="10,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="⏳زمان باقی‌مانده" ToolTip="زمان باقی‌مانده" FontSize="20" Margin="20,0,0,0"/>
+                        <TextBlock x:Name="txtRemaining" Margin="10,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                        <TextBlock Text="⏸️ قابلیت توقف" ToolTip="قابلیت توقف" FontSize="20"/>
+                        <TextBlock x:Name="txtCanPause" Margin="10,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <controls:ProgressBarWithText x:Name="mainProgress" Height="20" Margin="0,10,0,0" Maximum="100"/>
+                    <!--<TextBlock x:Name="txtMainProgress" Margin="0,5,0,0"/>-->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                        <!-- دکمه یکپارچه شروع/توقف -->
+                        <Button x:Name="btnToggleDownload" Width="80" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnToggleDownload_Click" Style="{DynamicResource btnstate}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Foreground="White" Margin="0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="▶️ شروع"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Status}" Value="Downloading">
+                                                    <Setter Property="Text" Value="⏸️ توقف"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Paused">
+                                                    <Setter Property="Text" Value="▶️ ادامه"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                    <Setter Property="Text" Value="✅ تکمیل"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                    <Setter Property="Text" Value="🔄 مجدد"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <!-- نمایش آیکون قرمز برای عدم قابلیت توقف -->
+                                <TextBlock Foreground="Red" Margin="5,0,0,0" FontSize="12">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding Status}" Value="Downloading"/>
+                                                        <Condition Binding="{Binding CanResume}" Value="False"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Setter Property="Text" Value="🚫"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                    <DataGrid x:Name="dgParts" Margin="0,10,0,0" AutoGenerateColumns="False" Height="120"
+                              AlternationCount="2"
+                              AlternatingRowBackground="{DynamicResource DataGridAlternatingRowBackground}"
+                              RowBackground="{DynamicResource DataGridRowBackground}"
+                              CellStyle="{DynamicResource CenteredCellStyle}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="بخش" Binding="{Binding Index}" Width="60"/>
+                            <DataGridTextColumn Header="شروع" Binding="{Binding Start}" Width="100"/>
+                            <DataGridTextColumn Header="پایان" Binding="{Binding End}" Width="100"/>
+                            <DataGridTextColumn Header="دانلود شده" Binding="{Binding Downloaded}" Width="100"/>
+                            <DataGridTemplateColumn Header="درصد" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ProgressBar Value="{Binding Progress, Mode=OneWay}" Minimum="0" Maximum="100" Height="20" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <!--<DataGridTextColumn Header="درصد" Binding="{Binding Progress}" Width="80"/>-->
+                            <DataGridTextColumn Header="وضعیت" Binding="{Binding StatusFa}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="🐢 محدودکننده سرعت">
+                <TabItem.ToolTip>محدودکننده سرعت</TabItem.ToolTip>
+                <StackPanel Margin="20">
+                    <TextBlock Text="🐢" ToolTip="محدودکننده سرعت" FontSize="20"/>
+                    <Slider x:Name="sliderSpeedLimit" Minimum="0" Maximum="10000" Width="300" Margin="10,0"/>
+                    <TextBlock x:Name="txtSpeedLimit" Margin="10,0"/>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="🏁 اتمام دانلود">
+                <TabItem.ToolTip>اتمام دانلود</TabItem.ToolTip>
+                <StackPanel Margin="20">
+                    <StackPanel Margin="20" Orientation="Horizontal">
+                        <TextBlock Text="📂" ToolTip="آدرس فایل" FontSize="20"/>
+                        <TextBox x:Name="txtFilePath" IsReadOnly="True" Margin="10,0" Width="454"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <Button Content="▶️" ToolTip="اجرا/بازکردن" Width="40" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnOpenFile_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
+                        <Button Content="🗂️" ToolTip="باز کردن با..." Width="40" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnOpenWith_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
+                        <Button Content="📂" ToolTip="باز کردن پوشه" Width="40" Height="40" Padding="0" Margin="5,0,0,0" Click="BtnOpenFolder_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
+                        <Button Content="❌" ToolTip="بستن" Width="40" Height="40" Padding="0" Margin="5,0,0,0"/>
+                    </StackPanel>
+                    <CheckBox Content="نمایش مجدد این پنجره" Margin="0,20,0,0"/>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window> 

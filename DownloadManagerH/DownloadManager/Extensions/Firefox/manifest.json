@@ -1,0 +1,55 @@
+{
+  "manifest_version": 2,
+  "name": "دانلود منجر حامد - یکپارچگی مرورگر",
+  "version": "2.0.0",
+  "description": "افزونه یکپارچگی پیشرفته برای دانلود منجر حامد با پشتیبانی از دانلود دسته‌ای و ویژگی‌های پیشرفته",
+  "permissions": [
+    "downloads",
+    "contextMenus", 
+    "storage",
+    "notifications",
+    "activeTab",
+    "tabs",
+    "http://127.0.0.1:24680/*",
+    "http://localhost:24680/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "default_title": "دانلود منجر حامد",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "web_accessible_resources": ["icon128.png"],
+  "applications": {
+    "gecko": {
+      "id": "download-manager-hamed@extension.local",
+      "strict_min_version": "57.0"
+    }
+  }
+} 
