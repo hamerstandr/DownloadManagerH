@@ -1,65 +1,15 @@
 ```
-# Compiled and build artifacts
-*.exe
-*.dll
-*.pdb
-*.obj
-*.ilk
-*.exp
-*.lib
-*.so
-*.dylib
-*.class
-*.jar
-*.war
-*.ear
-*.o
-*.a
-*.out
-
-# Dependencies
-packages/
-bin/
-obj/
-Debug/
-Release/
-x64/
-x86/
-
-# Logs and temp files
-*.log
-*.tmp
-*.temp
-*.cache
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vs/
-.vscode/
-*.userprefs
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-# OS generated files
-.DS_Store
-Thumbs.db
-ehthumbs.db
-Icon?
-desktop.ini
-
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-build/
-dist/
+# Browser extensions
+DownloadManagerH/DownloadManager/Extensions/Firefox/*.js
+DownloadManagerH/DownloadManager/Extensions/Firefox/*.html
+DownloadManagerH/DownloadManager/Extensions/Firefox/*.css
+DownloadManagerH/DownloadManager/Extensions/Firefox/*.json
+DownloadManagerH/DownloadManager/Extensions/Firefox/manifest.json
+DownloadManagerH/DownloadManager/Extensions/Firefox/dist/
+DownloadManagerH/DownloadManager/Extensions/Firefox/build/
+DownloadManagerH/DownloadManager/Extensions/Firefox/node_modules/
+DownloadManagerH/DownloadManager/Extensions/Firefox/.env
+DownloadManagerH/DownloadManager/Extensions/Firefox/.env.local
+DownloadManagerH/DownloadManager/Extensions/Firefox/.vscode/
+DownloadManagerH/DownloadManager/Extensions/Firefox/.idea/
 ```
