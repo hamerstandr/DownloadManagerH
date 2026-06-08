@@ -22,6 +22,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
 
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
@@ -56,7 +57,18 @@
                     <TextBlock Text="افزودن مستقیم دانلودهای افزونه:" VerticalAlignment="Center" Width="170"/>
                     <ToggleButton x:Name="toggleAddDirect" Width="50"/>
                 </StackPanel>
-                <Border Grid.Row="8" BorderBrush="#1976d2" BorderThickness="1" CornerRadius="6" Background="#f5faff" Margin="0,0,0,0" Padding="16" DockPanel.Dock="Bottom">
+                
+                <!-- انتخاب زبان -->
+                <StackPanel Orientation="Horizontal" Grid.Row="8" Margin="0,0,0,10">
+                    <TextBlock Text="🌐 زبان برنامه:" VerticalAlignment="Center" Width="170"/>
+                    <ComboBox x:Name="cmbLanguage" Width="150" SelectionChanged="CmbLanguage_SelectionChanged">
+                        <ComboBoxItem Content="فارسی (Persian)" Tag="fa"/>
+                        <ComboBoxItem Content="العربية (Arabic)" Tag="ar"/>
+                        <ComboBoxItem Content="English (انگلیسی)" Tag="en"/>
+                    </ComboBox>
+                </StackPanel>
+                
+                <Border Grid.Row="9" BorderBrush="#1976d2" BorderThickness="1" CornerRadius="6" Background="#f5faff" Margin="0,0,0,0" Padding="16" DockPanel.Dock="Bottom">
                     <StackPanel>
                         <TextBlock Text="نصب افزونه مرورگر" FontWeight="Bold" FontSize="16" Margin="0,0,0,8"/>
                         <TextBlock Text="برای دریافت لینک دانلود افزونه مناسب مرورگر خود، روی دکمه زیر کلیک کنید." Margin="0,0,0,8"/>
@@ -90,7 +102,7 @@
                 </Border>
                 
                 <!-- یکپارچگی با TrafficWatch -->
-                <GroupBox Header="📊 یکپارچگی با TrafficWatch" Grid.Row="9" Margin="0,10,0,0" Padding="10">
+                <GroupBox Header="📊 یکپارچگی با TrafficWatch" Grid.Row="10" Margin="0,10,0,0" Padding="10">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <CheckBox x:Name="chkTrafficWatch" Content="نمایش اطلاعات در داشبورد TrafficWatch" IsChecked="True" VerticalAlignment="Center"/>

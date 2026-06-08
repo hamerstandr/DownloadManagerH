@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Globalization;
 
 namespace DownloadManagerH.Models
 {
@@ -12,6 +13,7 @@ namespace DownloadManagerH.Models
         public static bool AddDownloadsDirectly { get; set; } = false; // افزودن مستقیم دانلودهای افزونه
         public static bool EnableTrafficWatchIntegration { get; set; } = true; // یکپارچگی با TrafficWatch
         public static int TrafficWatchPort { get; set; } = 9090; // پورت API TrafficWatch
+        public static string Language { get; set; } = "fa"; // زبان برنامه: fa, ar, en
         
         public static string ThemeColor { get; set; } = "#4caf50"; // رنگ تم یا رنگ دکمه‌ها
         public static int CountConctionDownloads { get; set; } = 3; // تعداد اتصالات موازی
@@ -26,5 +28,28 @@ namespace DownloadManagerH.Models
         );
 
         public static string TempDirectory => Path.Combine(DataDirectory, "temp");
+        
+        /// <summary>
+        /// دریافت فرهنگ بر اساس زبان انتخاب شده
+        /// </summary>
+        public static CultureInfo GetCultureInfo()
+        {
+            return Language.ToLower() switch
+            {
+                "ar" => new CultureInfo("ar-SA"),
+                "en" => new CultureInfo("en-US"),
+                _ => new CultureInfo("fa-IR") // پیش‌فرض فارسی
+            };
+        }
+        
+        /// <summary>
+        /// اعمال جهت متن بر اساس زبان
+        /// </summary>
+        public static FlowDirection GetFlowDirection()
+        {
+            return Language.ToLower() == "en" 
+                ? FlowDirection.LeftToRight 
+                : FlowDirection.RightToLeft;
+        }
     }
 } 

@@ -38,6 +38,59 @@ namespace DownloadManagerH.Windows
             toggleAddDirect.IsChecked = Settings.AddDownloadsDirectly;
             toggleAddDirect.Checked += (s, e) => Settings.AddDownloadsDirectly = true;
             toggleAddDirect.Unchecked += (s, e) => Settings.AddDownloadsDirectly = false;
+            
+            // بارگذاری تنظیمات زبان
+            LoadLanguageSettings();
+        }
+
+        /// <summary>
+        /// بارگذاری تنظیمات زبان
+        /// </summary>
+        private void LoadLanguageSettings()
+        {
+            // انتخاب زبان فعلی در ComboBox
+            string currentLanguage = Settings.Language.ToLower();
+            foreach (var item in cmbLanguage.Items)
+            {
+                if (item is ComboBoxItem comboItem && comboItem.Tag?.ToString().ToLower() == currentLanguage)
+                {
+                    cmbLanguage.SelectedItem = comboItem;
+                    break;
+                }
+            }
+            
+            // اگر هیچ زبانی انتخاب نشده بود، پیش‌فرض فارسی باشد
+            if (cmbLanguage.SelectedItem == null)
+            {
+                foreach (var item in cmbLanguage.Items)
+                {
+                    if (item is ComboBoxItem comboItem && comboItem.Tag?.ToString() == "fa")
+                    {
+                        cmbLanguage.SelectedItem = comboItem;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// رویداد تغییر زبان
+        /// </summary>
+        private void CmbLanguage_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (cmbLanguage.SelectedItem is ComboBoxItem selectedLanguage)
+            {
+                string languageCode = selectedLanguage.Tag?.ToString() ?? "fa";
+                Settings.Language = languageCode;
+                
+                // اعمال جهت متن بر اساس زبان
+                this.FlowDirection = Settings.GetFlowDirection();
+                
+                // ذخیره فرهنگ برای کل برنامه
+                var culture = Settings.GetCultureInfo();
+                System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+                System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+            }
         }
 
         private void BtnSave_Click(object sender, RoutedEventArgs e)
