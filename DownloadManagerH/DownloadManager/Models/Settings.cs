@@ -10,6 +10,8 @@ namespace DownloadManagerH.Models
         public static bool EnableStartup { get; set; } = false; // فعال بودن استارت‌آپ
         public static bool MonitorClipboard { get; set; } = true; // مانیتور کلیپ‌بورد
         public static bool AddDownloadsDirectly { get; set; } = false; // افزودن مستقیم دانلودهای افزونه
+        public static bool EnableTrafficWatchIntegration { get; set; } = true; // یکپارچگی با TrafficWatch
+        public static int TrafficWatchPort { get; set; } = 9090; // پورت API TrafficWatch
         
         public static string ThemeColor { get; set; } = "#4caf50"; // رنگ تم یا رنگ دکمه‌ها
         public static int CountConctionDownloads { get; set; } = 3; // تعداد اتصالات موازی

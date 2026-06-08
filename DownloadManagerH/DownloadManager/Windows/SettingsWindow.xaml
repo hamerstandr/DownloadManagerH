@@ -88,6 +88,21 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
+                
+                <!-- یکپارچگی با TrafficWatch -->
+                <GroupBox Header="📊 یکپارچگی با TrafficWatch" Grid.Row="9" Margin="0,10,0,0" Padding="10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <CheckBox x:Name="chkTrafficWatch" Content="نمایش اطلاعات در داشبورد TrafficWatch" IsChecked="True" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                            <TextBlock Text="پورت API:" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtTrafficWatchPort" Width="80" Margin="10,0,0,0" Text="9090" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="پس از تغییر پورت، برنامه را مجدداً راه‌اندازی کنید" FontSize="10" Foreground="Gray" Margin="20,5,0,0"/>
+                        <TextBlock Text="TrafficWatch یک داشبورد وب برای مانیتورینگ دانلودها است" FontSize="10" Foreground="Gray" Margin="20,2,0,0"/>
+                    </StackPanel>
+                </GroupBox>
             </Grid>
         </ScrollViewer>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="1" VerticalAlignment="Bottom">

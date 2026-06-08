@@ -76,5 +76,12 @@ namespace DownloadManagerH.Windows
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Extensions", "Edge");
             Process.Start("explorer.exe", path);
         }
+
+        private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            // بارگذاری تنظیمات TrafficWatch
+            chkTrafficWatch.IsChecked = Settings.EnableTrafficWatchIntegration;
+            txtTrafficWatchPort.Text = Settings.TrafficWatchPort.ToString();
+        }
     }
 } 

@@ -4,6 +4,7 @@ using DownloadManagerH.Windows;
 using DownloadManagerH.Windows.Dialog;
 using DownloadManagerH.Models;
 using DownloadManagerH.Models.Logging;
+using DownloadManagerH.Services;
 using Hardcodet.Wpf.TaskbarNotification;
 using System.Configuration;
 using System.Data;
@@ -21,6 +22,8 @@ namespace DownloadManagerH
         public static string appName = Assembly.GetExecutingAssembly().GetName().Name ?? "DownloadManagerH";
         private TaskbarIcon? trayIcon;
         private NativeMessagingRegistrar? nativeMessagingRegistrar;
+        private TrafficWatchIntegrationService? _trafficWatchService;
+        private DownloadManager? _downloadManager;
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -30,6 +33,9 @@ namespace DownloadManagerH
             
             // مقداردهی اولیه Native Messaging
             InitializeNativeMessaging();
+            
+            // مقداردهی اولیه TrafficWatch Integration
+            InitializeTrafficWatchIntegration();
             
             trayIcon = (TaskbarIcon)FindResource("TrayIcon");
             if (trayIcon != null)
@@ -94,6 +100,37 @@ namespace DownloadManagerH
         }
 
         /// <summary>
+        /// مقداردهی اولیه یکپارچگی با TrafficWatch
+        /// </summary>
+        private void InitializeTrafficWatchIntegration()
+        {
+            try
+            {
+                var logger = LoggerFactory.GetDefaultLogger();
+                
+                // دریافت نمونه DownloadManager از MainWindow
+                if (MainWindow.Me?.DownloadManager != null)
+                {
+                    _downloadManager = MainWindow.Me.DownloadManager;
+                    
+                    // فعال‌سازی یکپارچگی بر اساس تنظیمات (پیش‌فرض: فعال)
+                    bool enableIntegration = true; // قابل تغییر به Settings.EnableTrafficWatchIntegration
+                    int port = 9090; // قابل تغییر به Settings.TrafficWatchPort
+                    
+                    _trafficWatchService = new TrafficWatchIntegrationService(_downloadManager, logger);
+                    _trafficWatchService.Initialize(enableIntegration, port);
+                    
+                    logger.LogInfo($"TrafficWatch Integration initialized on port {port}");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"خطا در مقداردهی اولیه TrafficWatch Integration: {ex.Message}");
+                // در صورت خطا، برنامه همچنان کار می‌کند
+            }
+        }
+
+        /// <summary>
         /// مدیریت رویداد تغییر تم
         /// </summary>
         private void OnThemeChanged(object? sender, ThemeChangedEventArgs e)
@@ -147,6 +184,9 @@ namespace DownloadManagerH
         }
         protected override void OnExit(ExitEventArgs e)
         {
+            // توقف سرویس TrafficWatch
+            _trafficWatchService?.Dispose();
+            
             trayIcon?.Dispose();
             base.OnExit(e);
         }

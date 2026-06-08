@@ -837,6 +837,7 @@ namespace DownloadManagerH.Windows
                 clipboardMonitor.Stop();
         }
         internal static MainWindow? Me;
+        public Models.DownloadManager DownloadManager => manager;
         private void Manager_DownloadAdded(object? sender, DownloadItem item)
         {
             Dispatcher.Invoke(() =>
