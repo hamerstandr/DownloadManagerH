@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "دانلود منجر حامد - یکپارچگی مرورگر",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "افزونه یکپارچگی پیشرفته برای دانلود منجر حامد با پشتیبانی از دانلود دسته‌ای و ویژگی‌های پیشرفته",
   "permissions": [
     "downloads",
@@ -12,8 +12,8 @@
     "scripting"
   ],
   "host_permissions": [
-    "http://127.0.0.1:24680/*",
-    "http://localhost:24680/*"
+    "http://127.0.0.1:9090/*",
+    "http://localhost:9090/*"
   ],
   "background": {
     "service_worker": "background.js",
