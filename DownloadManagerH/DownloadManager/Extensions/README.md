@@ -251,7 +251,7 @@
 
 در صورت بروز مشکل یا داشتن سوال:
 - 📧 ایمیل: support@downloadmenger2.ir
-- 🐛 گزارش باگ: [GitHub Issues](https://github.com/hamerstandr/DownloadMenger2/issues)
+- 🐛 گزارش باگ: [GitHub Issues](https://github.com/hamerstandr/DownloadManagerH/issues)
 - 📖 مستندات: [README.md](../../README.md)
 
 ---
