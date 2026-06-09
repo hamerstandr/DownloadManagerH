@@ -1,5 +1,54 @@
-(docs/ADDON_DEVELOPMENT_GUIDE.md and README.md are documentation/source files, no build artifacts, dependencies, or temp files in the changes)
+```
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.userprefs
+*.suo
+*.user
+*.aps
+*.ncb
+*.ilk
+*.iobj
+*.ipdb
+*.tlog
+*.log
+*_i.c
+*_p.c
+*.manifest
+*.res
+*.rsp
+*.cmd
+*.bat
+*.tmp
+*.~*
+*.cache
+*.dotCover.snapshot
+*.pidb
+*.userosscache
+*.sln.docstates
+*.userprefs
 
-```markdown
+# Dependencies
+packages/
+node_modules/
+.nuget/
+.npm/
 
+# IDE
+.vs/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
 ```
