@@ -1,9 +1,9 @@
 // Enhanced Chrome Extension for Download Manager Hamed
 // Manifest V3 Service Worker Implementation
 
-// Configuration
+// Configuration - Updated to use port 9090
 const CONFIG = {
-    API_BASE_URL: 'http://127.0.0.1:24680',
+    API_BASE_URL: 'http://127.0.0.1:9090',
     API_ENDPOINTS: {
         ADD: '/add/',
         STATUS: '/status/',
@@ -13,12 +13,36 @@ const CONFIG = {
     RETRY_DELAY: 1000
 };
 
-// Extension state management
+// Extension state management with downloadable extensions filter
 let extensionSettings = {
     autoDetectDownloads: true,
     showNotifications: true,
     batchDownloadEnabled: true,
-    maxBatchSize: 50
+    maxBatchSize: 50,
+    // Filter mode: 'whitelist' or 'blacklist'
+    extensionFilterMode: 'whitelist',
+    // List of downloadable extensions
+    downloadableExtensions: [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ],
+    // Domain blacklist
+    domainBlacklist: ['localhost', '127.0.0.1', '::1'],
+    // Domain whitelist (empty means all domains allowed)
+    domainWhitelist: [],
+    // Domain filter mode
+    domainFilterMode: 'blacklist',
+    // Min file size for interception (bytes)
+    minFileSizeForInterception: 102400,
+    // Max file size (0 = no limit)
+    maxFileSizeForInterception: 0
 };
 
 // Initialize extension
@@ -335,36 +359,41 @@ async function handlePageLinkDetection(tab) {
 
 // Function to be injected into page for link detection
 function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
     const downloadableExtensions = [
-        'zip', 'rar', '7z', 'tar', 'gz', 'bz2',
-        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm',
-        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
-        'mp3', 'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv',
-        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp',
-        'iso', 'img', 'bin', 'apk', 'ipa'
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
     ];
-    
+
     const links = [];
     const anchors = document.querySelectorAll('a[href]');
-    
+
     anchors.forEach(anchor => {
         const href = anchor.href;
         const text = anchor.textContent.trim();
-        
+
         if (href && href.startsWith('http')) {
             try {
                 const url = new URL(href);
                 const pathname = url.pathname.toLowerCase();
                 const extension = pathname.split('.').pop();
-                
+
                 if (downloadableExtensions.includes(extension)) {
                     // Try to get file size from text or attributes
                     let filesize = null;
-                    const sizeMatch = text.match(/\(([0-9.]+\s*(KB|MB|GB))\)/i);
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
                     if (sizeMatch) {
                         filesize = sizeMatch[1];
                     }
-                    
+
                     links.push({
                         url: href,
                         filename: pathname.split('/').pop() || text,
@@ -378,7 +407,2445 @@ function detectDownloadableLinks() {
             }
         }
     });
-    
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
+    return links.slice(0, 100); // Limit to 100 links
+}
+// Function to be injected into page for link detection
+function detectDownloadableLinks() {
+    // Use extension settings from background script via chrome.runtime.sendMessage
+    // For now, use a comprehensive list that will be filtered by the background script
+    const downloadableExtensions = [
+        'zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz',
+        'exe', 'msi', 'dmg', 'pkg', 'deb', 'rpm', 'appimage',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+        'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v', 'mpeg', 'mpg', '3gp',
+        'mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a',
+        'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico', 'tiff', 'tif',
+        'iso', 'img', 'bin', 'cue',
+        'apk', 'ipa',
+        'torrent', 'magnet'
+    ];
+
+    const links = [];
+    const anchors = document.querySelectorAll('a[href]');
+
+    anchors.forEach(anchor => {
+        const href = anchor.href;
+        const text = anchor.textContent.trim();
+
+        if (href && href.startsWith('http')) {
+            try {
+                const url = new URL(href);
+                const pathname = url.pathname.toLowerCase();
+                const extension = pathname.split('.').pop();
+
+                if (downloadableExtensions.includes(extension)) {
+                    // Try to get file size from text or attributes
+                    let filesize = null;
+                    const sizeMatch = text.match(/(([0-9.]+s*(KB|MB|GB)))/i);
+                    if (sizeMatch) {
+                        filesize = sizeMatch[1];
+                    }
+
+                    links.push({
+                        url: href,
+                        filename: pathname.split('/').pop() || text,
+                        filesize: filesize,
+                        filetype: extension,
+                        linkText: text
+                    });
+                }
+            } catch (e) {
+                // Invalid URL, skip
+            }
+        }
+    });
+
     return links.slice(0, 100); // Limit to 100 links
 }
 
@@ -695,7 +3162,7 @@ async function showExtensionHelp() {
 
 🔧 عیب‌یابی:
 • اطمینان حاصل کنید دانلود منجر حامد در حال اجرا است
-• پورت 24680 باید آزاد باشد
+• پورت 9090 باید آزاد باشد
 • فایروال یا آنتی‌ویروس ممکن است ارتباط را مسدود کند
 
 📞 پشتیبانی:
