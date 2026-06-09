@@ -1,15 +1,15 @@
-# راهنمای اتصال DownloadMenger2 به TrafficWatch
+# راهنمای اتصال DownloadManagerH به TrafficWatch
 
 <div dir="rtl" align="right">
 
 ## مقدمه
-این سند راهنمای کاملی برای توسعه‌دهندگان DownloadMenger2 است تا بتوانند امکان نمایش اطلاعات در داشبورد وب TrafficWatch را به برنامه خود اضافه کنند. این اتصال کاملاً اختیاری است و در صورت نصب بودن هر دو برنامه، کاربر می‌تواند از طریق تنظیمات TrafficWatch این ویژگی را فعال کند.
+این سند راهنمای کاملی برای توسعه‌دهندگان DownloadManagerH است تا بتوانند امکان نمایش اطلاعات در داشبورد وب TrafficWatch را به برنامه خود اضافه کنند. این اتصال کاملاً اختیاری است و در صورت نصب بودن هر دو برنامه، کاربر می‌تواند از طریق تنظیمات TrafficWatch این ویژگی را فعال کند.
 
 ## معماری ارتباط
 
 ```
 ┌─────────────────────┐         HTTP API          ┌──────────────────────┐
-│   TrafficWatch      │ ────────────────────────> │   DownloadMenger2    │
+│   TrafficWatch      │ ────────────────────────> │   DownloadManagerH    │
 │   (پورت 8080)       │ <──────────────────────── │   (پورت 9090)        │
 │                     │       JSON Response       │                      │
 └─────────────────────┘                           └──────────────────────┘
@@ -177,7 +177,7 @@
 }
 ```
 
-## پیاده‌سازی در DownloadMenger2
+## پیاده‌سازی در DownloadManagerH
 
 ### مرحله 1: افزودن کتابخانه‌های مورد نیاز
 
@@ -205,7 +205,7 @@ using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
 
-namespace DownloadMenger2.Services
+namespace DownloadManagerH.Services
 {
     public class TrafficWatchIntegrationService
     {
@@ -352,7 +352,7 @@ public partial class App : Application
 
 ### مرحله 5: افزودن UI برای تنظیمات
 
-در صفحه تنظیمات DownloadMenger2:
+در صفحه تنظیمات DownloadManagerH:
 
 ```xml
 <GroupBox Header="یکپارچه‌سازی با TrafficWatch">
@@ -405,7 +405,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:9090/api/downloads/active
 
 ### مشکل: TrafficWatch اطلاعات را نشان نمی‌دهد
 
-1. بررسی کنید DownloadMenger2 در حال اجرا است
+1. بررسی کنید DownloadManagerH در حال اجرا است
 2. بررسی کنید پورت 9090 آزاد است
 3. لاگ‌های TrafficWatch را چک کنید
 4. با curl یا Postman API را تست کنید
@@ -425,7 +425,7 @@ Invoke-RestMethod -Uri http://127.0.0.1:9090/api/downloads/active
 
 یک نمونه کامل در مخزن GitHub قرار خواهد گرفت:
 ```
-https://github.com/hamerstandr/DownloadMenger2/tree/main/TrafficWatchIntegration 
+https://github.com/hamerstandr/DownloadManagerH/tree/main/TrafficWatchIntegration 
 ```
 
 ## سوالات متداول
@@ -445,13 +445,13 @@ https://github.com/hamerstandr/DownloadMenger2/tree/main/TrafficWatchIntegration
 ## تماس و پشتیبانی
 
 برای گزارش مشکلات یا提出 پیشنهادات:
-- GitHub Issues: https://github.com/hamerstandr/DownloadMenger2/issues 
+- GitHub Issues: https://github.com/hamerstandr/DownloadManagerH/issues 
 - Email: support@downloadmenger2.ir
 
 ---
 
 **نسخه سند:** 1.0  
 **تاریخ انتشار:** 2024  
-**تهیه شده برای:** DownloadMenger2 Team
+**تهیه شده برای:** DownloadManagerH Team
 
 </div>

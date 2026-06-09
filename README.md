@@ -1,4 +1,4 @@
-# دانلود منجر حامد (DownloadMengerH)
+# دانلود منجر حامد (DownloadManagerH)
 
 <div dir="rtl" align="right">
 
@@ -24,8 +24,8 @@
 ### روش کامپایل از سورس
 1. مخزن را کلون کنید:
    ```bash
-   git clone https://github.com/hamerstandr/DownloadMengerH.git
-   cd DownloadMenger2
+   git clone https://github.com/hamerstandr/DownloadManagerH.git
+   cd DownloadManagerH
    ```
 2. پروژه را بیلد کنید:
    ```bash
@@ -49,9 +49,9 @@
 
 | مرورگر | وضعیت | مسیر فایل‌ها |
 |--------|-------|-------------|
-| **Google Chrome** | ✅ آماده | `Extensions/Chrome/` |
-| **Microsoft Edge** | ✅ آماده | `Extensions/Edge/` |
-| **Mozilla Firefox** | ✅ آماده | `Extensions/Firefox/` |
+| **Google Chrome** | ✅ آماده | `DownloadManager/Extensions/Chrome/` |
+| **Microsoft Edge** | ✅ آماده | `DownloadManager/Extensions/Edge/` |
+| **Mozilla Firefox** | ✅ آماده | `DownloadManager/Extensions/Firefox/` |
 
 ### نحوه نصب افزونه (بدون نیاز به بسته‌بندی)
 نیازی به زیپ کردن فایل‌ها نیست. مراحل زیر را طی کنید:
@@ -60,12 +60,12 @@
 1. مرورگر را باز کنید و به آدرس `chrome://extensions` (یا `edge://extensions`) بروید.
 2. گزینه **Developer mode** را در گوشه بالا فعال کنید.
 3. روی دکمه **Load unpacked** کلیک کنید.
-4. پوشه مربوطه (مثلاً `Extensions/Chrome`) را انتخاب کنید.
+4. پوشه مربوطه (مثلاً `DownloadManager/Extensions/Chrome`) را انتخاب کنید.
 
 #### برای فایرفاکس:
 1. به آدرس `about:debugging#/runtime/this-firefox` بروید.
 2. روی **Load Temporary Add-on** کلیک کنید.
-3. فایل `manifest.json` داخل پوشه `Extensions/Firefox` را انتخاب کنید.
+3. فایل `manifest.json` داخل پوشه `DownloadManager/Extensions/Firefox` را انتخاب کنید.
 
 > **نکته:** افزونه‌ها به‌صورت خودکار با برنامه اصلی روی پورت `9090` ارتباط برقرار می‌کنند.
 
@@ -93,15 +93,22 @@
 ## 🛠 ساختار پروژه
 
 ```text
-DownloadMengerH/
-├── src/                  # کدهای منبع اصلی (C# / XAML)
-├── Extensions/           # سورس کد افزونه‌های مرورگر
-│   ├── Chrome/
-│   ├── Edge/
-│   └── Firefox/
-├── docs/                 # مستندات فنی و راهنماها
-├── assets/               # تصاویر و منابع گرافیکی
-└── README.md             # همین فایل
+DownloadManagerH/
+├── DownloadManager/          # کدهای منبع اصلی (C# / XAML)
+│   ├── Models/               # مدل‌های داده
+│   ├── Services/             # سرویس‌های برنامه
+│   ├── Windows/              # پنجره‌های WPF
+│   ├── Controls/             # کنترل‌های سفارشی
+│   ├── Extensions/           # افزونه‌های مرورگر
+│   │   ├── Chrome/
+│   │   ├── Edge/
+│   │   └── Firefox/
+│   ├── ChromeExtension/      # افزونه کروم
+│   ├── NativeMessagingManifests/
+│   └── res/                  # منابع
+├── docs/                     # مستندات فنی و راهنماها
+├── DownloadManager.zip       # فایل فشرده پروژه
+└── DownloadManagerH.sln      # فایل راه‌حل Visual Studio
 ```
 
 ---
@@ -121,6 +128,7 @@ DownloadMengerH/
 
 - **[راهنمای یکپارچه‌سازی با TrafficWatch](docs/TRAFFIC_WATCH_INTEGRATION.md)** - راهنمای کامل اتصال به داشبورد مانیتورینگ
 - **[راهنمای افزونه‌های مرورگر](docs/EXTENSIONS_GUIDE.md)** - نصب و پیکربندی افزونه‌های Chrome، Edge و Firefox
-- **[راهنمای توسعه افزونه‌های داشبورد](docs/ADDON_DEVELOPMENT_GUIDE.md)** - آموزش ایجاد افزونه‌های جدید برای TrafficWatch
+- **[راهنمای سیستم افزونه‌ها](DownloadManager/Services/PluginSystem/README.md)** - آموزش ایجاد افزونه‌های جدید با Named Pipe
+- **[راهنمای کامل افزونه‌های مرورگر](DownloadManager/Extensions/README.md)** - جزئیات نصب و استفاده از افزونه‌ها
 
 </div>
