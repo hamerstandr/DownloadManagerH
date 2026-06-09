@@ -24,7 +24,7 @@
 ### روش کامپایل از سورس
 1. مخزن را کلون کنید:
    ```bash
-   git clone https://github.com/hamerstandr/DownloadMenger2.git
+   git clone https://github.com/hamerstandr/DownloadMengerH.git
    cd DownloadMenger2
    ```
 2. پروژه را بیلد کنید:
@@ -93,7 +93,7 @@
 ## 🛠 ساختار پروژه
 
 ```text
-DownloadMenger2/
+DownloadMengerH/
 ├── src/                  # کدهای منبع اصلی (C# / XAML)
 ├── Extensions/           # سورس کد افزونه‌های مرورگر
 │   ├── Chrome/
