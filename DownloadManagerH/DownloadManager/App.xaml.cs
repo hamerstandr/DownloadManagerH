@@ -5,6 +5,7 @@ using DownloadManagerH.Windows.Dialog;
 using DownloadManagerH.Models;
 using DownloadManagerH.Models.Logging;
 using DownloadManagerH.Services;
+using DownloadManagerH.Services.PluginSystem;
 using Hardcodet.Wpf.TaskbarNotification;
 using System.Configuration;
 using System.Data;
@@ -23,6 +24,7 @@ namespace DownloadManagerH
         private TaskbarIcon? trayIcon;
         private NativeMessagingRegistrar? nativeMessagingRegistrar;
         private TrafficWatchIntegrationService? _trafficWatchService;
+        private NamedPipePluginServer? _pluginServer;
         private DownloadManager? _downloadManager;
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -122,12 +124,61 @@ namespace DownloadManagerH
                     
                     logger.LogInfo($"TrafficWatch Integration initialized on port {port}");
                 }
+                
+                // شروع سرور Named Pipe برای افزونه‌ها
+                _pluginServer = new NamedPipePluginServer(logger);
+                _pluginServer.DataReceived += OnPluginDataReceived;
+                _pluginServer.PluginRegistered += OnPluginRegistered;
+                _pluginServer.PluginDisconnected += OnPluginDisconnected;
+                _pluginServer.Start();
+                
+                logger.LogInfo("Named Pipe Plugin Server started");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"خطا در مقداردهی اولیه TrafficWatch Integration: {ex.Message}");
                 // در صورت خطا، برنامه همچنان کار می‌کند
             }
+        }
+
+        /// <summary>
+        /// مدیریت رویداد دریافت داده از افزونه
+        /// </summary>
+        private void OnPluginDataReceived(object? sender, PluginDataReceivedEventArgs e)
+        {
+            try
+            {
+                var logger = LoggerFactory.GetDefaultLogger();
+                // اینجا می‌توان داده‌های استریم شده از افزونه را پردازش کرد
+                // مثلاً بروزرسانی UI داشبورد با اطلاعات موسیقی
+                logger.LogDebug($"Data received from plugin {e.AddonId}: {e.Data}");
+                
+                // ارسال رویداد به ViewModel یا سایر بخش‌ها
+                // این بخش بسته به معماری برنامه قابل تغییر است
+            }
+            catch (Exception ex)
+            {
+                var logger = LoggerFactory.GetDefaultLogger();
+                logger.LogError("Error processing plugin data", ex);
+            }
+        }
+
+        /// <summary>
+        /// مدیریت رویداد ثبت نام افزونه
+        /// </summary>
+        private void OnPluginRegistered(object? sender, PluginRegisteredEventArgs e)
+        {
+            var logger = LoggerFactory.GetDefaultLogger();
+            logger.LogInfo($"Plugin registered: {e.Plugin.Name} v{e.Plugin.Version} ({e.Plugin.Id})");
+        }
+
+        /// <summary>
+        /// مدیریت رویداد قطع اتصال افزونه
+        /// </summary>
+        private void OnPluginDisconnected(object? sender, PluginDisconnectedEventArgs e)
+        {
+            var logger = LoggerFactory.GetDefaultLogger();
+            logger.LogInfo($"Plugin disconnected: {e.PluginId}");
         }
 
         /// <summary>
@@ -186,6 +237,9 @@ namespace DownloadManagerH
         {
             // توقف سرویس TrafficWatch
             _trafficWatchService?.Dispose();
+            
+            // توقف سرور Named Pipe
+            _pluginServer?.Dispose();
             
             trayIcon?.Dispose();
             base.OnExit(e);
