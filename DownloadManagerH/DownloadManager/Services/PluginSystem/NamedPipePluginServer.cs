@@ -11,7 +11,7 @@ using DownloadManagerH.Models.Logging;
 namespace DownloadManagerH.Services.PluginSystem
 {
     /// <summary>
-    /// سرور Named Pipe برای ارتباط با افزونه‌های TrafficWatch
+    /// سرور Named Pipe برای ارتباط با افزونه‌های DownloadManager
     /// امکان دریافت داده‌های استریم از برنامه‌های شخص ثالث را فراهم می‌کند
     /// </summary>
     public class NamedPipePluginServer : IDisposable
