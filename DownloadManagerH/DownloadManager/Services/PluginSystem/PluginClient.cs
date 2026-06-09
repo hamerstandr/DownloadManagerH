@@ -10,8 +10,8 @@ using DownloadManagerH.Models.Logging;
 namespace DownloadManagerH.Services.PluginSystem
 {
     /// <summary>
-    /// نمونه کلاینت برای اتصال به سرور Named Pipe TrafficWatch
-    /// افزونه‌ها می‌توانند از این کلاس برای ارتباط با TrafficWatch استفاده کنند
+    /// نمونه کلاینت برای اتصال به سرور Named Pipe DownloadManager
+    /// افزونه‌ها می‌توانند از این کلاس برای ارتباط با DownloadManager استفاده کنند
     /// </summary>
     public class PluginClient : IDisposable
     {
@@ -35,13 +35,13 @@ namespace DownloadManagerH.Services.PluginSystem
         }
 
         /// <summary>
-        /// اتصال به سرور TrafficWatch
+        /// اتصال به سرور DownloadManager
         /// </summary>
         public async Task ConnectAsync()
         {
             if (_isConnected)
             {
-                _logger.LogWarning("Already connected to TrafficWatch");
+                _logger.LogWarning("Already connected to DownloadManager");
                 return;
             }
 
@@ -59,26 +59,26 @@ namespace DownloadManagerH.Services.PluginSystem
 
                 if (!_pipeClient.IsConnected)
                 {
-                    throw new TimeoutException("Failed to connect to TrafficWatch");
+                    throw new TimeoutException("Failed to connect to DownloadManager");
                 }
 
                 _isConnected = true;
                 _cancellationTokenSource = new CancellationTokenSource();
                 _readTask = Task.Run(() => ReadResponsesAsync(_cancellationTokenSource.Token));
 
-                _logger.LogInfo("Connected to TrafficWatch successfully");
+                _logger.LogInfo("Connected to DownloadManager successfully");
                 Connected?.Invoke(this, EventArgs.Empty);
             }
             catch (Exception ex)
             {
-                _logger.LogError("Failed to connect to TrafficWatch", ex);
+                _logger.LogError("Failed to connect to DownloadManager", ex);
                 _isConnected = false;
                 throw;
             }
         }
 
         /// <summary>
-        /// ثبت نام افزونه در TrafficWatch
+        /// ثبت نام افزونه در DownloadManager
         /// </summary>
         public async Task<bool> RegisterAsync(string name, string version, string icon = "📦")
         {
@@ -101,7 +101,7 @@ namespace DownloadManagerH.Services.PluginSystem
         }
 
         /// <summary>
-        /// ارسال داده استریم به TrafficWatch
+        /// ارسال داده استریم به DownloadManager
         /// </summary>
         public async Task SendStreamDataAsync(object payload)
         {
@@ -264,7 +264,7 @@ namespace DownloadManagerH.Services.PluginSystem
                 _pipeClient?.Dispose();
                 _isConnected = false;
 
-                _logger.LogInfo("Disconnected from TrafficWatch");
+                _logger.LogInfo("Disconnected from DownloadManager");
             }
             catch (Exception ex)
             {

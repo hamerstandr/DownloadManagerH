@@ -1,14 +1,14 @@
-# راهنمای اتصال افزونه‌ها به TrafficWatch از طریق Named Pipe
+# راهنمای اتصال افزونه‌ها به DownloadManager از طریق Named Pipe
 
 ## معرفی
-این سند نحوه استریم داده‌های زنده (مانند اطلاعات موسیقی در حال پخش) از برنامه‌های شخص ثالث به داشبورد TrafficWatch را توضیح می‌دهد.
+این سند نحوه استریم داده‌های زنده (مانند اطلاعات app در حال پخش) از برنامه‌های شخص ثالث به داشبورد DownloadManager را توضیح می‌دهد.
 
 ## معماری ارتباطی
 
 ```
 ┌─────────────────┐     Named Pipe      ┌──────────────────┐
-│  برنامه افزونه  │ ◄─────────────────► │   TrafficWatch   │
-│  (Music Player) │    TrafficWatch     │   (Server)       │
+│  برنامه افزونه  │ ◄─────────────────► │ DownloadManager  │
+│      (app)      │    TrafficWatch     │   (Server)       │
 │                 │    PluginPipe       │                  │
 └─────────────────┘                     └──────────────────┘
        │                                        │
@@ -17,25 +17,29 @@
        │ 3. Heartbeat                           │ 3. بروزرسانی داشبورد
 ```
 
+**نکته:** نام Named Pipe برابر `TrafficWatchPluginPipe` است که برای سازگاری با پروتکل TrafficWatch انتخاب شده است.
+
 ## سناریوی اجرا
 
 ### مرحله 1: اجرای سرویس اصلی
 به محض اجرای برنامه DownloadManager، سرور Named Pipe به صورت خودکار فعال می‌شود و روی پایپ `TrafficWatchPluginPipe` گوش می‌دهد.
 
-### مرحله 2: اجرای برنامه افزونه (مثلاً پخش کننده موسیقی)
+**نکته:** اگر TrafficWatch نصب باشد، سرویس مربوطه وصل می‌شود. در غیر این صورت برنامه به کار خود ادامه می‌دهد.
+
+### مرحله 2: اجرای برنامه افزونه (مثلاً Streamer)
 برنامه افزونه با استفاده از `PluginClient` به سرور متصل می‌شود:
 
 ```csharp
-// در برنامه پخش کننده موسیقی
-var plugin = new MusicStreamerPlugin();
+// در برنامه Streamer
+var plugin = new StreamerPlugin();
 await plugin.StartAsync();
 ```
 
 ### مرحله 3: ثبت نام خودکار
-افزونه به صورت خودکار ثبت شده و در داشبورد TrafficWatch نمایش داده می‌شود.
+افزونه به صورت خودکار ثبت شده و در داشبورد DownloadManager نمایش داده می‌شود.
 
-### مرحله 4: استریم داده‌های موسیقی
-اطلاعات آهنگ در حال پخش به صورت بلادرنگ به داشبورد ارسال می‌شود.
+### مرحله 4: استریم داده‌های app
+اطلاعات app در حال پخش به صورت بلادرنگ به داشبورد ارسال می‌شود.
 
 ## پروتکل ارتباطی
 
@@ -45,7 +49,7 @@ await plugin.StartAsync();
 ```json
 {
   "action": "register",
-  "name": "Music Player Plugin",
+  "name": "app Plugin",
   "version": "2.0.0",
   "icon": "🎵"
 }
@@ -84,22 +88,22 @@ await plugin.StartAsync();
 }
 ```
 
-## نمونه کد کامل افزونه موسیقی
+## نمونه کد کامل افزونه app
 
 ```csharp
 using System;
 using System.Threading.Tasks;
 using DownloadManagerH.Services.PluginSystem;
 
-namespace MusicPlayerAddon
+namespace appAddon
 {
     public class Program
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine("🎵 Music Player Addon Starting...");
+            Console.WriteLine("🎵 app Addon Starting...");
 
-            var plugin = new MusicStreamerPlugin();
+            var plugin = new StreamerPlugin();
             await plugin.StartAsync();
 
             Console.WriteLine("Press any key to stop...");
@@ -109,7 +113,7 @@ namespace MusicPlayerAddon
         }
     }
 
-    public class MusicStreamerPlugin
+    public class StreamerPlugin
     {
         private PluginClient? _client;
         private System.Timers.Timer? _heartbeatTimer;
@@ -126,25 +130,25 @@ namespace MusicPlayerAddon
             await _client.ConnectAsync();
 
             // ثبت نام افزونه
-            await _client.RegisterAsync("Music Player", "1.0.0", "🎵");
+            await _client.RegisterAsync("app", "1.0.0", "🎵");
 
             // شروع حلقه Heartbeat
             _ = _client.StartHeartbeatLoopAsync();
 
             _isRunning = true;
 
-            // شبیه‌سازی ارسال داده موسیقی
-            await SimulateMusicStreaming();
+            // شبیه‌سازی ارسال داده app
+            await SimulateStreaming();
         }
 
         private void OnConnected(object? sender, EventArgs e)
         {
-            Console.WriteLine("✅ Connected to TrafficWatch");
+            Console.WriteLine("✅ Connected to DownloadManager");
         }
 
         private void OnDisconnected(object? sender, EventArgs e)
         {
-            Console.WriteLine("❌ Disconnected from TrafficWatch");
+            Console.WriteLine("❌ Disconnected from DownloadManager");
         }
 
         private void OnResponseReceived(object? sender, ServerResponseEventArgs e)
@@ -155,17 +159,17 @@ namespace MusicPlayerAddon
             }
         }
 
-        private async Task SimulateMusicStreaming()
+        private async Task SimulateStreaming()
         {
             while (_isRunning)
             {
-                // شبیه‌سازی تغییر آهنگ هر 10 ثانیه
+                // شبیه‌سازی تغییر داده هر 10 ثانیه
                 await Task.Delay(10000);
 
                 var nowPlaying = new
                 {
                     type = "now_playing",
-                    title = GetRandomSong(),
+                    title = GetRandomTitle(),
                     artist = GetRandomArtist(),
                     album = GetRandomAlbum(),
                     duration = "4:30",
@@ -178,7 +182,7 @@ namespace MusicPlayerAddon
             }
         }
 
-        private string GetRandomSong() => 
+        private string GetRandomTitle() => 
             new[] { "Bohemian Rhapsody", "Hotel California", "Imagine", "Hey Jude" }
             .OrderBy(_ => Guid.NewGuid()).First();
 
@@ -201,7 +205,7 @@ namespace MusicPlayerAddon
 }
 ```
 
-## رویدادهای DashboardAddonService
+## رویدادهای NamedPipePluginServer
 
 برای دریافت داده‌های استریم در داشبورد، از رویداد `DataReceived` در `NamedPipePluginServer` استفاده کنید:
 
@@ -220,12 +224,12 @@ _pluginServer.DataReceived += (sender, e) =>
         
         if (type == "now_playing")
         {
-            // بروزرسانی UI با اطلاعات موسیقی
+            // بروزرسانی UI با اطلاعات app
             string title = data.RootElement.GetProperty("title").GetString() ?? "";
             string artist = data.RootElement.GetProperty("artist").GetString() ?? "";
 
-            // آپدیت تب موسیقی در داشبورد
-            UpdateMusicTab(title, artist);
+            // آپدیت تب app در داشبورد
+            UpdateAppTab(title, artist);
         }
     }
 };
@@ -235,7 +239,7 @@ _pluginServer.DataReceived += (sender, e) =>
 
 | فایل | توضیحات |
 |------|---------|
-| `NamedPipePluginServer.cs` | سرور Named Pipe در TrafficWatch |
+| `NamedPipePluginServer.cs` | سرور Named Pipe در DownloadManager |
 | `PluginClient.cs` | کلاینت نمونه برای افزونه‌ها |
 | `App.xaml.cs` | مقداردهی اولیه سرور Named Pipe |
 

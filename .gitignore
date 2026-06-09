@@ -7,6 +7,8 @@
 *.so
 *.a
 *.out
+*.pyc
+*.class
 
 # Dependencies
 node_modules/
@@ -18,27 +20,33 @@ __pycache__/
 target/
 .gradle/
 
-# Logs and temp files
-*.log
-*.tmp
+# Build directories
+dist/
+build/
+coverage/
+htmlcov/
+
+# Editors/IDE
+.vscode/
+.idea/
 *.swp
+*.swo
+*.tmp
+
+# Logs
+*.log
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# Editors
-.vscode/
-.idea/
-
-# System files
+# System
 .DS_Store
 Thumbs.db
+.CVS
 
 # Coverage
-coverage/
-htmlcov/
 .coverage
 
 # Compressed files
@@ -60,4 +68,8 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
