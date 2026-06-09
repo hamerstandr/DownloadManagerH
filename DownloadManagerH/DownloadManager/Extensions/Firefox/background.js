@@ -3,7 +3,7 @@
 
 // Configuration
 const CONFIG = {
-    API_BASE_URL: 'http://127.0.0.1:24680',
+    API_BASE_URL: 'http://127.0.0.1:9090',
     API_ENDPOINTS: {
         ADD: '/add/',
         STATUS: '/status/',
@@ -692,7 +692,7 @@ async function showExtensionHelp() {
 
 🔧 عیب‌یابی:
 • اطمینان حاصل کنید دانلود منجر حامد در حال اجرا است
-• پورت 24680 باید آزاد باشد
+• پورت 9090 باید آزاد باشد
 • فایروال یا آنتی‌ویروس ممکن است ارتباط را مسدود کند
 
 📞 پشتیبانی:
