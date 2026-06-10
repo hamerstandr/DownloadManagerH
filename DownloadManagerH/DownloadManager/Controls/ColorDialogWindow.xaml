@@ -1,7 +1,7 @@
 <Window x:Class="DownloadManagerH.Controls.ColorDialogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="انتخاب رنگ" Height="450" Width="400" 
+        Title="انتخاب رنگ" Height="500" Width="400" 
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         FlowDirection="RightToLeft">
     <Grid Margin="15">
@@ -21,7 +21,7 @@
                        VerticalAlignment="Bottom" Margin="0,0,0,10" 
                        Foreground="White" FontWeight="Bold" FontSize="14"
                        Background="Transparent" BorderThickness="0"
-                       TextAlignment="Center" KeyDown="TxtColorHex_KeyDown" KeyUp="TxtColorHex_KeyUp"/>
+                       TextAlignment="Center" KeyDown="TxtColorHex_KeyDown" KeyUp="TxtColorHex_KeyUp" FlowDirection="LeftToRight"/>
         </Border>
 
         <!-- اسلایدرهای RGB -->
