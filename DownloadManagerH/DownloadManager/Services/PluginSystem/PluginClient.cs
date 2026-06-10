@@ -55,7 +55,7 @@ namespace DownloadManagerH.Services.PluginSystem
 
                 _logger.LogInfo($"Connecting to pipe: {_pipeName}...");
 
-                await _pipeClient.ConnectAsync(TimeSpan.FromSeconds(5));
+                await _pipeClient.ConnectAsync(5000);
 
                 if (!_pipeClient.IsConnected)
                 {
