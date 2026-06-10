@@ -1,21 +1,58 @@
+```
+# Build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.userprefs
+*.cache
+*.compiled
+
+# Dependencies
+packages/
+
+# Logs
+*.log
 
 # User-specific files
-**/UserSettings.json
-**/*.userprefs
-**/*.userosscache
-**/*.sln.docstates
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
 
-# Testing
-TestResults/
+# Windows
+Thumbs.db
+ehthumbs.db
+Icon?
+desktop.ini
 
-# Localized resources
-**/Debug/
-**/Release/
-**/x64/
-**/x86/
-**/ARM/
-**/ARM64/
+# macOS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+
+# Environment variables
+.env
+.env.local
+*.env*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 ```
-**/.vs/
-**/obj/
-**/publish/
