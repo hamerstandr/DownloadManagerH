@@ -1,7 +1,7 @@
 <Window x:Class="DownloadManagerH.Controls.ColorDialogWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="انتخاب رنگ" Height="350" Width="400" 
+        Title="انتخاب رنگ" Height="450" Width="400" 
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         FlowDirection="RightToLeft">
     <Grid Margin="15">
@@ -27,17 +27,17 @@
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="قرمز:" Width="50" VerticalAlignment="Center"/>
                 <Slider x:Name="sliderRed" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
-                <TextBox x:Name="txtRed" Width="40" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+                <TextBox x:Name="txtRed" Width="70" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
                 <TextBlock Text="سبز:" Width="50" VerticalAlignment="Center"/>
                 <Slider x:Name="sliderGreen" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
-                <TextBox x:Name="txtGreen" Width="40" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+                <TextBox x:Name="txtGreen" Width="70" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="آبی:" Width="50" VerticalAlignment="Center"/>
                 <Slider x:Name="sliderBlue" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
-                <TextBox x:Name="txtBlue" Width="40" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+                <TextBox x:Name="txtBlue" Width="70" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
         </StackPanel>
 
