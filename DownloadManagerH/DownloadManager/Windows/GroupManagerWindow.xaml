@@ -77,12 +77,12 @@
                         <!-- نام گروه -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <TextBlock Text="نام گروه:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="txtGroupName" Width="150" Margin="10,0"/>
+                            <TextBox x:Name="txtGroupName" Width="150" Height="60" Margin="10,0"/>
                         </StackPanel>
                         <!-- رنگ گروه -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <TextBlock Text="رنگ گروه:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="txtGroupColor" Width="80" Margin="10,0"/>
+                            <TextBox x:Name="txtGroupColor" Width="150" Height="60" Margin="10,0"/>
                         </StackPanel>
                         <!-- زمان‌بندی -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
@@ -158,22 +158,22 @@
                             <DataTemplate>
                                 <DockPanel>
                                     <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
-                                    <Button ToolTip="بالا بردن اولویت" Width="100" Height="32" Margin="5,0,0,0" Click="BtnUpPriority_Click">
+                                    <Button ToolTip="بالا بردن اولویت" Width="100" Height="38" Margin="5,0,0,0" Click="BtnUpPriority_Click">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Image Width="14" Height="14" Source="{StaticResource CheckIcon}"/>
-                                            <TextBlock Text="بالا" Margin="5,0,0,0"/>
+                                            <TextBlock Text="بالا" Margin="5,0,0,0" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button ToolTip="پایین آوردن اولویت" Width="100" Height="32" Margin="5,0,0,0" Click="BtnDownPriority_Click">
+                                    <Button ToolTip="پایین آوردن اولویت" Width="100" Height="38" Margin="5,0,0,0" Click="BtnDownPriority_Click">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Image Width="14" Height="14" Source="{StaticResource PauseIcon}"/>
-                                            <TextBlock Text="پایین" Margin="5,0,0,0"/>
+                                            <TextBlock Text="پایین" Margin="5,0,0,0" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button ToolTip="حذف دانلود از لیست" Width="60" Height="32" Margin="5,0,0,0" Click="BtnRemoveDownload_Click">
+                                    <Button ToolTip="حذف دانلود از لیست" Width="80" Height="38" Margin="5,0,0,0" Click="BtnRemoveDownload_Click">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Image Width="14" Height="14" Source="{StaticResource CrossIcon}"/>
-                                            <TextBlock Text="حذف" Margin="5,0,0,0"/>
+                                            <TextBlock Text="حذف" Margin="5,0,0,0" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                 </DockPanel>
@@ -206,7 +206,7 @@
             <Button ToolTip="توقف صف" Width="100" Height="40" Margin="5,0,0,0" Click="BtnPauseQueue_Click">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Image Width="16" Height="16" Source="{StaticResource PauseIcon}"/>
-                    <TextBlock Text="توقف" Margin="5,0,0,0"/>
+                    <TextBlock Text="توقف" Margin="5,0,0,0" Foreground="White"/>
                 </StackPanel>
             </Button>
         </StackPanel>
