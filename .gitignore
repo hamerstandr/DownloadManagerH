@@ -1,1 +1,54 @@
-Nothing should be ignored since only source code files (.cs) were modified and no build artifacts, dependencies, or temporary files were present in the changes.
+```
+# Build results
+bin/
+obj/
+out/
+
+# User-specific files
+.vs/
+*.userprefs
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results of Visual Studio projects
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# Visual Studio Code
+.vscode/
+
+# Environment specific settings
+.env
+.env.local
+*.env
+*.local.env
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*~
+```
+**/Debug/
