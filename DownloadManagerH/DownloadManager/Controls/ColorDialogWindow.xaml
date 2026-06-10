@@ -17,9 +17,11 @@
             <Border.Background>
                 <SolidColorBrush x:Name="previewBrush" Color="#FF007ACC"/>
             </Border.Background>
-            <TextBlock x:Name="txtColorHex" Text="#FF007ACC" HorizontalAlignment="Center" 
+            <TextBox x:Name="txtColorHex" Text="#FF007ACC" HorizontalAlignment="Center" 
                        VerticalAlignment="Bottom" Margin="0,0,0,10" 
-                       Foreground="White" FontWeight="Bold" FontSize="14"/>
+                       Foreground="White" FontWeight="Bold" FontSize="14"
+                       Background="Transparent" BorderThickness="0"
+                       TextAlignment="Center" KeyDown="TxtColorHex_KeyDown" KeyUp="TxtColorHex_KeyUp"/>
         </Border>
 
         <!-- اسلایدرهای RGB -->

@@ -81,5 +81,60 @@ namespace DownloadManagerH.Controls
             DialogResult = false;
             Close();
         }
+
+        private void TxtColorHex_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                TryParseHexColor();
+                e.Handled = true;
+            }
+        }
+
+        private void TxtColorHex_KeyUp(object sender, KeyEventArgs e)
+        {
+            TryParseHexColor();
+        }
+
+        private void TryParseHexColor()
+        {
+            string hex = txtColorHex.Text.Trim();
+            
+            if (string.IsNullOrEmpty(hex))
+                return;
+
+            if (!hex.StartsWith("#"))
+                hex = "#" + hex;
+
+            Color? parsedColor = null;
+
+            try
+            {
+                if (hex.Length == 7) // #RRGGBB
+                {
+                    byte r = byte.Parse(hex.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte g = byte.Parse(hex.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte b = byte.Parse(hex.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                    parsedColor = Color.FromRgb(r, g, b);
+                }
+                else if (hex.Length == 9) // #AARRGGBB
+                {
+                    byte a = byte.Parse(hex.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte r = byte.Parse(hex.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte g = byte.Parse(hex.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte b = byte.Parse(hex.Substring(7, 2), System.Globalization.NumberStyles.HexNumber);
+                    parsedColor = Color.FromArgb(a, r, g, b);
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            if (parsedColor.HasValue)
+            {
+                UpdateFromColor(parsedColor.Value);
+            }
+        }
     }
 }
