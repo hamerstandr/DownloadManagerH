@@ -82,7 +82,7 @@
                         <!-- رنگ گروه -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <TextBlock Text="رنگ گروه:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="txtGroupColor" Width="150" Height="60" Margin="10,0"/>
+                            <local1:ColorPicker x:Name="colorPickerGroup" Width="150" Margin="10,0"/>
                         </StackPanel>
                         <!-- زمان‌بندی -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
