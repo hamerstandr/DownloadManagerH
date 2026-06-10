@@ -29,17 +29,17 @@
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="قرمز:" Width="50" VerticalAlignment="Center"/>
                 <Slider x:Name="sliderRed" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
-                <TextBox x:Name="txtRed" Width="70" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+                <TextBox x:Name="txtRed" Width="80" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
                 <TextBlock Text="سبز:" Width="50" VerticalAlignment="Center"/>
                 <Slider x:Name="sliderGreen" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
-                <TextBox x:Name="txtGreen" Width="70" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+                <TextBox x:Name="txtGreen" Width="80" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                 <TextBlock Text="آبی:" Width="50" VerticalAlignment="Center"/>
                 <Slider x:Name="sliderBlue" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
-                <TextBox x:Name="txtBlue" Width="70" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+                <TextBox x:Name="txtBlue" Width="80" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
             </StackPanel>
         </StackPanel>
 
