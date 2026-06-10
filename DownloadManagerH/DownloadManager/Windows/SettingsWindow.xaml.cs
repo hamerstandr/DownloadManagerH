@@ -3,6 +3,7 @@ using DownloadManagerH.Models;
 using DownloadManagerH.Windows;
 using System.Diagnostics;
 using System.IO;
+using System.Windows.Controls;
 
 namespace DownloadManagerH.Windows
 {
@@ -52,7 +53,7 @@ namespace DownloadManagerH.Windows
             string currentLanguage = Settings.Language.ToLower();
             foreach (var item in cmbLanguage.Items)
             {
-                if (item is ComboBoxItem comboItem && comboItem.Tag?.ToString().ToLower() == currentLanguage)
+                if (item is ComboBoxItem comboItem && comboItem.Tag+"".ToLower() == currentLanguage)
                 {
                     cmbLanguage.SelectedItem = comboItem;
                     break;
