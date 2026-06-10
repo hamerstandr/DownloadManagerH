@@ -183,7 +183,7 @@ namespace DownloadManagerH.Windows
                         if (child is ToggleButton btn)
                         {
                             var dayName = btn.Content?.ToString();
-                            btn.IsChecked = group.WeeklyDays.Contains(dayName);
+                            btn.IsChecked = !string.IsNullOrEmpty(dayName) && group.WeeklyDays.Contains(dayName);
                         }
                     }
                 }
@@ -340,9 +340,9 @@ namespace DownloadManagerH.Windows
             // شروع صف دانلود گروه
             if (lstGroups.SelectedItem is DownloadGroup activeGroup)
             {
-                foreach (var download in activeGroup.Downloads.Where(d => d.Status == "Paused" || d.Status == "Stopped"))
+                foreach (var download in activeGroup.Downloads.Where(d => d.Status == DownloadStatus.Paused || d.Status == DownloadStatus.Stopped))
                 {
-                    manager.StartDownload(download);
+                    _ = manager.StartDownloadAsync(download);
                 }
                 CustomMessageBox.ShowMessageBox($"شروع دانلودهای گروه '{activeGroup.Name}'", "شروع صف", CustomMessageBoxType.OK);
             }
@@ -353,7 +353,7 @@ namespace DownloadManagerH.Windows
             // توقف صف دانلود گروه
             if (lstGroups.SelectedItem is DownloadGroup activeGroup)
             {
-                foreach (var download in activeGroup.Downloads.Where(d => d.Status == "Downloading"))
+                foreach (var download in activeGroup.Downloads.Where(d => d.Status == DownloadStatus.Downloading))
                 {
                     manager.PauseDownload(download);
                 }
