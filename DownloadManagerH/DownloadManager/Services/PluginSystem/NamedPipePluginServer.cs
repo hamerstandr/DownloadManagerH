@@ -144,7 +144,7 @@ namespace DownloadManagerH.Services.PluginSystem
                         continue;
                     }
 
-                    await ProcessMessageAsync(pluginId, message, connection);
+                    await ProcessMessageAsync(pluginId, message.Value, connection);
                 }
             }
             catch (OperationCanceledException)
