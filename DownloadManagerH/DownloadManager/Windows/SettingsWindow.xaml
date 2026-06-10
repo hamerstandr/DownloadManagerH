@@ -50,7 +50,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Row="6" Margin="0,0,0,10">
                     <TextBlock Text="🎨 رنگ تم دکمه‌ها:" VerticalAlignment="Center" Width="170"/>
-                    <TextBox x:Name="txtThemeColor" Width="80"/>
+                    <local1:ColorPicker x:Name="colorPickerTheme" Width="120"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Row="7" Margin="0,0,0,10">
                     <TextBlock Text="افزودن مستقیم دانلودهای افزونه:" VerticalAlignment="Center" Width="170"/>
