@@ -1,0 +1,66 @@
+<Window x:Class="DownloadManagerH.Controls.ColorDialogWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="انتخاب رنگ" Height="350" Width="400" 
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        FlowDirection="RightToLeft">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- نمایش رنگ فعلی -->
+        <Border Grid.Row="0" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Height="80" Margin="0,0,0,15">
+            <Border.Background>
+                <SolidColorBrush x:Name="previewBrush" Color="#FF007ACC"/>
+            </Border.Background>
+            <TextBlock x:Name="txtColorHex" Text="#FF007ACC" HorizontalAlignment="Center" 
+                       VerticalAlignment="Bottom" Margin="0,0,0,10" 
+                       Foreground="White" FontWeight="Bold" FontSize="14"/>
+        </Border>
+
+        <!-- اسلایدرهای RGB -->
+        <StackPanel Grid.Row="1" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="قرمز:" Width="50" VerticalAlignment="Center"/>
+                <Slider x:Name="sliderRed" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
+                <TextBox x:Name="txtRed" Width="40" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="سبز:" Width="50" VerticalAlignment="Center"/>
+                <Slider x:Name="sliderGreen" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
+                <TextBox x:Name="txtGreen" Width="40" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="آبی:" Width="50" VerticalAlignment="Center"/>
+                <Slider x:Name="sliderBlue" Minimum="0" Maximum="255" Width="200" ValueChanged="Sliders_ValueChanged"/>
+                <TextBox x:Name="txtBlue" Width="40" Text="0" TextAlignment="Center" Margin="10,0,0,0"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- رنگ‌های از پیش تعریف شده -->
+        <WrapPanel Grid.Row="2" Margin="0,15,0,15" HorizontalAlignment="Center">
+            <Border Width="30" Height="30" Margin="5" Background="#FFE53935" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FFEC407A" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FFAB47BC" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF7E57C2" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF42A5F5" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF26A69A" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF66BB6A" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FFEEA500" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FFFF7043" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF8D6E63" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF78909C" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+            <Border Width="30" Height="30" Margin="5" Background="#FF263238" Cursor="Hand" MouseLeftButtonDown="PresetColor_Click"/>
+        </WrapPanel>
+
+        <!-- دکمه‌ها -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+            <Button Content="تأیید" Width="80" Margin="0,0,10,0" Click="BtnOK_Click" Background="#4CAF50" Foreground="White"/>
+            <Button Content="انصراف" Width="80" Click="BtnCancel_Click" Background="#F44336" Foreground="White"/>
+        </StackPanel>
+    </Grid>
+</Window>
