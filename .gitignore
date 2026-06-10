@@ -1,1 +1,21 @@
-Nothing should be ignored based on the provided file changes, as they only include source code files (.xaml and .cs) without any build artifacts, dependencies, or temporary files.
+
+# User-specific files
+**/UserSettings.json
+**/*.userprefs
+**/*.userosscache
+**/*.sln.docstates
+
+# Testing
+TestResults/
+
+# Localized resources
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ARM/
+**/ARM64/
+```
+**/.vs/
+**/obj/
+**/publish/
