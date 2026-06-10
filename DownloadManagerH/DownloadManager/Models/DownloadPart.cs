@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 
 namespace DownloadManagerH.Models
 {
@@ -18,6 +19,16 @@ namespace DownloadManagerH.Models
         public long Downloaded { get; set; }
         public PartStatus Status { get; set; }
         public string TempFilePath { get; set; } = ""; // مسیر فایل موقت برای هر بخش
+        
+        [JsonIgnore]
         public double Progress => (End > Start) ? (Downloaded * 100.0 / (End - Start + 1)) : 0;
+        
+        /// <summary>
+        /// مقدار دانلود شده این بخش را نسبت به کل بخش تنظیم می‌کند
+        /// </summary>
+        public void SetDownloaded(long downloadedBytes)
+        {
+            Downloaded = Math.Min(downloadedBytes, End - Start + 1);
+        }
     }
 } 
