@@ -272,27 +272,6 @@ namespace DownloadManagerH.Models
         }
 
         [JsonPropertyName("data")]
-        public new SettingsData? Data { get; set; }
-    }
-
-    /// <summary>
-    /// Settings data structure
-    /// </summary>
-    public class SettingsData
-    {
-        [JsonPropertyName("defaultDownloadPath")]
-        public string DefaultDownloadPath { get; set; } = "";
-
-        [JsonPropertyName("addDownloadsDirectly")]
-        public bool AddDownloadsDirectly { get; set; }
-
-        [JsonPropertyName("maxConcurrentDownloads")]
-        public int MaxConcurrentDownloads { get; set; }
-
-        [JsonPropertyName("enableClipboardMonitoring")]
-        public bool EnableClipboardMonitoring { get; set; }
-
-        [JsonPropertyName("enableDownloadInterception")]
-        public bool EnableDownloadInterception { get; set; }
+        public new DownloadManagerH.Models.SettingsData? Data { get; set; }
     }
 }
