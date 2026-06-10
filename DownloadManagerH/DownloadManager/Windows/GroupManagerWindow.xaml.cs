@@ -158,7 +158,7 @@ namespace DownloadManagerH.Windows
         {
             if (lstGroups.SelectedItem is DownloadGroup group)
             {
-                txtGroupColor.SelectedColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(group.Color);
+                txtGroupColor.Text = group.Color;
                 numGroupConcurrent.Value = group.Concurrent;
                 txtGroupName.Text = group.Name;
                 // Disable name editing for default group
@@ -259,7 +259,7 @@ namespace DownloadManagerH.Windows
         {
             if (lstGroups.SelectedItem is DownloadGroup group)
             {
-                group.Color = txtGroupColor.SelectedColor.ToString();
+                group.Color = txtGroupColor.Text;
                 group.Concurrent = numGroupConcurrent.Value;
                 group.Name = txtGroupName.Text;
                 // Schedule type
