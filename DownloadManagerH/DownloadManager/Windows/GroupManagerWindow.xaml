@@ -1,7 +1,6 @@
 <Window x:Class="DownloadManagerH.Windows.GroupManagerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         xmlns:models="clr-namespace:DownloadManagerH.Models"
         xmlns:windows="clr-namespace:DownloadManagerH.Windows"
         xmlns:local1="clr-namespace:DownloadManagerH.Controls"
@@ -83,7 +82,7 @@
                         <!-- رنگ گروه -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                             <TextBlock Text="رنگ گروه:" VerticalAlignment="Center"/>
-                            <colorpicker:PortableColorPicker x:Name="txtGroupColor" Width="80" Margin="10,0"/>
+                            <TextBox x:Name="txtGroupColor" Width="80" Margin="10,0"/>
                         </StackPanel>
                         <!-- زمان‌بندی -->
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,10">

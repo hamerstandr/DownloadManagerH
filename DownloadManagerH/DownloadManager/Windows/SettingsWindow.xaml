@@ -1,7 +1,6 @@
 <Window x:Class="DownloadManagerH.Windows.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:colorpicker="clr-namespace:ColorPicker;assembly=ColorPicker"
         xmlns:models="clr-namespace:DownloadManagerH.Models" 
         xmlns:local1="clr-namespace:DownloadManagerH.Controls"
         Title="تنظیمات" Height="500" Width="800" FlowDirection="RightToLeft" 
@@ -51,7 +50,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Row="6" Margin="0,0,0,10">
                     <TextBlock Text="🎨 رنگ تم دکمه‌ها:" VerticalAlignment="Center" Width="170"/>
-                    <colorpicker:PortableColorPicker x:Name="txtThemeColor" Width="80"/>
+                    <TextBox x:Name="txtThemeColor" Width="80"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Grid.Row="7" Margin="0,0,0,10">
                     <TextBlock Text="افزودن مستقیم دانلودهای افزونه:" VerticalAlignment="Center" Width="170"/>
