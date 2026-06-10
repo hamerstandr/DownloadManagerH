@@ -23,9 +23,9 @@ namespace DownloadManagerH
         public static string appName = Assembly.GetExecutingAssembly().GetName().Name ?? "DownloadManagerH";
         private TaskbarIcon? trayIcon;
         private NativeMessagingRegistrar? nativeMessagingRegistrar;
-        private TrafficWatchIntegrationService? _trafficWatchService;
+        //private TrafficWatchIntegrationService? _trafficWatchService;
         private NamedPipePluginServer? _pluginServer;
-        private DownloadManager? _downloadManager;
+        //private DownloadManager? _downloadManager;
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
@@ -111,19 +111,19 @@ namespace DownloadManagerH
                 var logger = LoggerFactory.GetDefaultLogger();
                 
                 // دریافت نمونه DownloadManager از MainWindow
-                if (MainWindow.Me?.DownloadManager != null)
-                {
-                    _downloadManager = MainWindow.Me.DownloadManager;
+                //if (MainWindow.Me?.DownloadManager != null)
+                //{
+                //    _downloadManager = MainWindow.Me.DownloadManager;
                     
                     // فعال‌سازی یکپارچگی بر اساس تنظیمات (پیش‌فرض: فعال)
-                    bool enableIntegration = true; // قابل تغییر به Settings.EnableTrafficWatchIntegration
-                    int port = 9090; // قابل تغییر به Settings.TrafficWatchPort
+                    //bool enableIntegration = true; // قابل تغییر به Settings.EnableTrafficWatchIntegration
+                    //int port = 9090; // قابل تغییر به Settings.TrafficWatchPort
                     
-                    _trafficWatchService = new TrafficWatchIntegrationService(_downloadManager, logger);
-                    _trafficWatchService.Initialize(enableIntegration, port);
+                    //_trafficWatchService = new TrafficWatchIntegrationService(_downloadManager, logger);
+                    //_trafficWatchService.Initialize(enableIntegration, port);
                     
-                    logger.LogInfo($"TrafficWatch Integration initialized on port {port}");
-                }
+                    //logger.LogInfo($"TrafficWatch Integration initialized on port {port}");
+                //}
                 
                 // شروع سرور Named Pipe برای افزونه‌ها
                 _pluginServer = new NamedPipePluginServer(logger);
@@ -236,7 +236,7 @@ namespace DownloadManagerH
         protected override void OnExit(ExitEventArgs e)
         {
             // توقف سرویس TrafficWatch
-            _trafficWatchService?.Dispose();
+            //_trafficWatchService?.Dispose();
             
             // توقف سرور Named Pipe
             _pluginServer?.Dispose();

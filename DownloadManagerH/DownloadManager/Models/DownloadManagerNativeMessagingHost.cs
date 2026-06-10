@@ -21,7 +21,7 @@ namespace DownloadManagerH.Models
         private readonly DownloadInterceptionManager _interceptionManager;
         private readonly PriorityMessageQueue _priorityQueue;
         private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly object _sendLock = new object();
+        private readonly Lock _sendLock = new Lock();
         
         private Task? _listeningTask;
         private bool _isRunning = false;

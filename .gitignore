@@ -1,1 +1,20 @@
-Nothing needs to be added to the .gitignore file based on the provided changes. The only modified file is a source code file (.cs), which should not be ignored.
+
+# User-specific files
+**/UserSettings.json
+**/*.userprefs
+**/*.userosscache
+**/*.sln.docstates
+
+# Testing
+TestResults/
+
+# Localized resources
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ARM/
+**/ARM64/
+```
+**/.vs/
+**/obj/
