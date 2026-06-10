@@ -1,9 +1,12 @@
 using System.Windows;
 using DownloadManagerH.Models;
 using DownloadManagerH.Windows;
+using DownloadManagerH.Windows.Dialog;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Controls;
+using DownloadManagerH.Models.Logging;
+using DownloadManagerH.Controls;
 
 namespace DownloadManagerH.Windows
 {
@@ -136,6 +139,37 @@ namespace DownloadManagerH.Windows
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Extensions", "Edge");
             Process.Start("explorer.exe", path);
+        }
+
+        /// <summary>
+        /// بررسی و نصب Native Messaging برای مرورگرها
+        /// </summary>
+        private async void BtnCheckNativeMessaging_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var logger = LoggerFactory.GetDefaultLogger();
+                var registrar = new NativeMessagingRegistrar(logger);
+                
+                // نمایش وضعیت فعلی
+                if (registrar.IsRegistered)
+                {
+                    CustomMessageBox.Show("Native Messaging قبلاً نصب شده است.", "وضعیت", CustomMessageBoxType.OK);
+                }
+                else
+                {
+                    var result = CustomMessageBox.Show("Native Messaging نصب نیست. آیا می‌خواهید آن را نصب کنید؟", "نصب", CustomMessageBoxType.YesNo);
+                    if (result == CustomMessageBoxResult.Yes)
+                    {
+                        await registrar.RegisterHostAsync();
+                        CustomMessageBox.Show("Native Messaging با موفقیت نصب شد.", "موفق", CustomMessageBoxType.OK);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CustomMessageBox.Show($"خطا در بررسی/نصب Native Messaging: {ex.Message}", "خطا", CustomMessageBoxType.OK);
+            }
         }
 
         private void SettingsWindow_Loaded(object sender, RoutedEventArgs e)

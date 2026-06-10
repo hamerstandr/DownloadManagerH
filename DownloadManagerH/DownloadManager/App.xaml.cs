@@ -90,9 +90,17 @@ namespace DownloadManagerH
                 
                 // ثبت Native Messaging host در رجیستری
                 nativeMessagingRegistrar = new NativeMessagingRegistrar(logger);
-                await nativeMessagingRegistrar.RegisterHostAsync();
                 
-                logger.LogInfo("Native Messaging Host registered successfully");
+                // فقط اگر قبلاً ثبت نشده است، ثبت را انجام بده
+                if (!nativeMessagingRegistrar.IsRegistered)
+                {
+                    await nativeMessagingRegistrar.RegisterHostAsync();
+                    logger.LogInfo("Native Messaging Host registered successfully on first run");
+                }
+                else
+                {
+                    logger.LogInfo("Native Messaging Host already registered");
+                }
             }
             catch (Exception ex)
             {
