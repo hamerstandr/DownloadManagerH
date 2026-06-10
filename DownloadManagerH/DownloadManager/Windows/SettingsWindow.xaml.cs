@@ -35,7 +35,14 @@ namespace DownloadManagerH.Windows
                 }
             };
             txtDefaultPath.Text = Settings.DefaultDownloadPath;
-            txtThemeColor.Text = Settings.ThemeColor;
+            
+            // بارگذاری رنگ تم
+            string themeColor = Settings.ThemeColor;
+            if (!string.IsNullOrEmpty(themeColor))
+            {
+                colorPickerTheme.SetHexColor(themeColor);
+            }
+            
             toggleAddDirect.IsChecked = Settings.AddDownloadsDirectly;
             toggleAddDirect.Checked += (s, e) => Settings.AddDownloadsDirectly = true;
             toggleAddDirect.Unchecked += (s, e) => Settings.AddDownloadsDirectly = false;
@@ -103,7 +110,7 @@ namespace DownloadManagerH.Windows
             Settings.EnableStartup = toggleStartup.IsChecked == true;
             Settings.MonitorClipboard = toggleClipboard.IsChecked == true;
             Settings.DefaultDownloadPath = txtDefaultPath.Text;
-            Settings.ThemeColor = txtThemeColor.Text;
+            Settings.ThemeColor = colorPickerTheme.GetHexColor();
             DialogResult = true;
             StartupManager.SetStartup(Settings.EnableStartup);
             Close();
