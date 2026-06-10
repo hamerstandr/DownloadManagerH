@@ -153,5 +153,10 @@ namespace DownloadManagerH.Windows
             _isRunning = false;
             base.OnClosed(e);
         }
+
+        private void OpenLoger_Click(object sender, RoutedEventArgs e)
+        {
+            new LogViewerWindow().ShowDialog();
+        }
     }
 }
