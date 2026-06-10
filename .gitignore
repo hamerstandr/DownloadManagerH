@@ -1,1 +1,21 @@
-Nothing should be ignored based on the provided file changes. The modified file is a JSON configuration file for a native messaging manifest, which is a source/config file that should not be ignored.
+
+# User-specific files
+**/UserSettings.json
+**/*.userprefs
+**/*.userosscache
+**/*.sln.docstates
+
+# Testing
+TestResults/
+
+# Localized resources
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ARM/
+**/ARM64/
+```
+**/.vs/
+**/obj/
+**/publish/
