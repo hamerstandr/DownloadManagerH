@@ -1,21 +1,32 @@
+```gitignore
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.nupkg
+*.snupkg
 
-# User-specific files
-**/UserSettings.json
-**/*.userprefs
-**/*.userosscache
-**/*.sln.docstates
+# Dependencies
+packages/
+node_modules/
 
-# Testing
-TestResults/
+# Logs
+*.log
 
-# Localized resources
-**/Debug/
-**/Release/
-**/x64/
-**/x86/
-**/ARM/
-**/ARM64/
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
 ```
-**/.vs/
-**/obj/
-**/publish/

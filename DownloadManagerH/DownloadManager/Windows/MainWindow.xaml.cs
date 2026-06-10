@@ -243,7 +243,7 @@ namespace DownloadManagerH.Windows
                 }
                 manager.PauseDownload(item);
                 dgDownloads.Items.Refresh();
-                manager.SaveDownloads();
+                // حذف SaveDownloads تکراری چون در PauseDownload انجام شده
                 OnPropertyChanged(nameof(AverageSpeed));
             }
         }
@@ -281,7 +281,7 @@ namespace DownloadManagerH.Windows
                         }
                         manager.PauseDownload(item);
                         dgDownloads.Items.Refresh();
-                        manager.SaveDownloads();
+                        // حذف SaveDownloads تکراری چون در PauseDownload انجام شده
                         OnPropertyChanged(nameof(AverageSpeed));
                         break;
                         

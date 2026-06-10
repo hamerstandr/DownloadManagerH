@@ -338,6 +338,12 @@ namespace DownloadManagerH.Models
                 var tasks = item.Parts.Select(part => DownloadPartAsync(item, part, tempFile));
                 await Task.WhenAll(tasks);
                 
+                // بررسی وضعیت توقف یا暂停 - اگر دانلود متوقف شده، از تکمیل شدن جلوگیری کن
+                if (item.Status == DownloadStatus.Paused || item.Status == DownloadStatus.Stopped)
+                {
+                    return false;
+                }
+                
                 // بررسی نتیجه دانلود
                 if (item.Parts.All(p => p.Status == PartStatus.Completed))
                 {
@@ -370,7 +376,11 @@ namespace DownloadManagerH.Models
                 }
                 else
                 {
-                    item.Status = DownloadStatus.Failed;
+                    // اگر دانلود متوقف شده، وضعیت را تغییر نده
+                    if (item.Status != DownloadStatus.Paused && item.Status != DownloadStatus.Stopped)
+                    {
+                        item.Status = DownloadStatus.Failed;
+                    }
                     var failedParts = item.Parts.Count(p => p.Status == PartStatus.Failed);
                     var errorMsg = $"دانلود فایل '{item.FileName}' ناموفق بود. {failedParts} بخش از {item.Parts.Count} بخش با خطا مواجه شد.";
                     currentDownloadErrors.Add(errorMsg);
@@ -466,14 +476,21 @@ namespace DownloadManagerH.Models
                         SaveDownloads();
                     if (item.Status==DownloadStatus.Paused)
                     {
+                        part.Status = PartStatus.Pending; // حفظ وضعیت برای ادامه بعدی
                         break;
                     }
                     else if (item.Status==DownloadStatus.Stopped)
                     {
+                        part.Status = PartStatus.Failed; // توقف کامل
                         return;
                     }
                 }
-                part.Status = PartStatus.Completed;
+                
+                // فقط در صورتی وضعیت را Completed قرار بده که متوقف نشده باشد
+                if (item.Status != DownloadStatus.Paused && item.Status != DownloadStatus.Stopped)
+                {
+                    part.Status = PartStatus.Completed;
+                }
             }
             catch (IOException ex)
             {
@@ -503,6 +520,9 @@ namespace DownloadManagerH.Models
                 item.Status = DownloadStatus.Paused;
             else
                 item.Status = DownloadStatus.Stopped;
+            
+            // ذخیره فوری وضعیت دانلود
+            SaveDownloads();
         }
 
         public static async Task ResumeDownload(DownloadItem item)
