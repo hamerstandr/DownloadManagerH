@@ -224,6 +224,21 @@ namespace DownloadManagerH.Models
                 // مسیر موقت برای دانلود
                 string tempFile = Path.Combine(Settings.TempDirectory, item.FileName);
                 string finalFile = Path.Combine(item.SavePath, item.FileName);
+                
+                // محاسبه مقدار دانلود شده از بخش‌های موجود (برای ادامه دانلود)
+                if (item.Parts.Count > 0 && item.DownloadedBytes == 0)
+                {
+                    // جمع‌آوری مقدار دانلود شده از تمام بخش‌ها
+                    long totalDownloaded = item.Parts.Sum(p => p.Downloaded);
+                    item.DownloadedBytes = totalDownloaded;
+                    
+                    if (totalDownloaded > 0)
+                    {
+                        _logger.LogInfo($"ادامه دانلود - مقدار دانلود شده: {totalDownloaded} بایت", new { FileName = item.FileName });
+                    }
+                }
+                
+                // اگر بخش‌ها از قبل وجود دارند (ادامه دانلود)، مستقیماً به دانلود بخش‌ها برو
                 if (item.Parts.Count == 0)
                 {
                     // بررسی و اصلاح URL
@@ -285,7 +300,10 @@ namespace DownloadManagerH.Models
                         }
                         
                         _logger.LogDebug($"فایل به {item.ParallelParts} بخش تقسیم شد", new { item.FileName, Parts = item.ParallelParts });
-                        item.Progress = item.TotalBytes / item.DownloadedBytes * 100;
+                        if (item.DownloadedBytes > 0)
+                            item.Progress = ((double)item.DownloadedBytes / item.TotalBytes) * 100;
+                        else
+                            item.Progress = 0;
                     }
                     catch (HttpRequestException ex)
                     {
@@ -334,8 +352,14 @@ namespace DownloadManagerH.Models
                 foreach (var part in item.Parts)
                 {
                     part.TempFilePath = tempFile;
+                    // اگر بخش قبلاً کامل شده، آن را رد کن
+                    if (part.Status == PartStatus.Completed)
+                        continue;
+                    // برای ادامه دانلود، بخش‌های متوقف شده را به وضعیت Pending برگردان
+                    if (part.Status == PartStatus.Failed || part.Status == PartStatus.Downloading)
+                        part.Status = PartStatus.Pending;
                 }
-                var tasks = item.Parts.Select(part => DownloadPartAsync(item, part, tempFile));
+                var tasks = item.Parts.Where(p => p.Status != PartStatus.Completed).Select(part => DownloadPartAsync(item, part, tempFile));
                 await Task.WhenAll(tasks);
                 
                 // بررسی وضعیت توقف یا暂停 - اگر دانلود متوقف شده، از تکمیل شدن جلوگیری کن
@@ -527,14 +551,14 @@ namespace DownloadManagerH.Models
 
         public static async Task ResumeDownload(DownloadItem item)
         {
-            if (item.Status == DownloadStatus.Paused && item.CanResume)
-                item.Status = DownloadStatus.Downloading;
-            else
-            {
-                var manager = MainWindow.Me?.manager;
-                if (manager == null) return;
-                await manager.StartDownloadAsync(item);
-            }
+            var manager = MainWindow.Me?.manager;
+            if (manager == null) return;
+            
+            // تغییر وضعیت به در حال دانلود
+            item.Status = DownloadStatus.Downloading;
+            
+            // شروع مجدد دانلود
+            await manager.StartDownloadAsync(item);
         }
         
         // متدهای نمایش پیام
