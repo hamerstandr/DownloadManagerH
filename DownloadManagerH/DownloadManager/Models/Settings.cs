@@ -247,7 +247,10 @@ namespace DownloadManagerH.Models
                         DomainFilterMode = DomainFilterMode,
                         UrlPatterns = UrlPatterns,
                         MinFileSizeForInterception = MinFileSizeForInterception,
-                        MaxFileSizeForInterception = MaxFileSizeForInterception
+                        MaxFileSizeForInterception = MaxFileSizeForInterception,
+                        MaxConcurrentDownloads = MaxConcurrentDownloadsLimit,
+                        EnableClipboardMonitoring = MonitorClipboard,
+                        EnableDownloadInterception = true
                     };
 
                     var options = new JsonSerializerOptions
@@ -302,6 +305,12 @@ namespace DownloadManagerH.Models
                         UrlPatterns = settingsData.UrlPatterns ?? new List<string>();
                         MinFileSizeForInterception = settingsData.MinFileSizeForInterception;
                         MaxFileSizeForInterception = settingsData.MaxFileSizeForInterception;
+                        
+                        // Sync new properties if they exist in loaded data
+                        if (settingsData.MaxConcurrentDownloads != 0)
+                            MaxConcurrentDownloadsLimit = settingsData.MaxConcurrentDownloads;
+                        if (settingsData.EnableClipboardMonitoring != default)
+                            MonitorClipboard = settingsData.EnableClipboardMonitoring;
                     }
                 }
                 catch (Exception ex)
@@ -382,5 +391,10 @@ namespace DownloadManagerH.Models
         public List<string> UrlPatterns { get; set; } = new List<string>();
         public long MinFileSizeForInterception { get; set; } = 102400;
         public long MaxFileSizeForInterception { get; set; } = 0;
+        
+        // Properties for Native Messaging Host
+        public int MaxConcurrentDownloads { get; set; } = 5;
+        public bool EnableClipboardMonitoring { get; set; } = true;
+        public bool EnableDownloadInterception { get; set; } = true;
     }
 } 
