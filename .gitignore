@@ -1,20 +1,39 @@
-
-# User-specific files
-**/UserSettings.json
-**/*.userprefs
-**/*.userosscache
-**/*.sln.docstates
-
-# Testing
-TestResults/
-
-# Localized resources
+```gitignore
+# Build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.nupkg
+*.snupkg
 **/Debug/
 **/Release/
-**/x64/
-**/x86/
-**/ARM/
-**/ARM64/
-```
-**/.vs/
+**/bin/
 **/obj/
+
+# Dependencies
+packages/
+node_modules/
+.nuget/
+.nyc_output/
+coverage/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+```
