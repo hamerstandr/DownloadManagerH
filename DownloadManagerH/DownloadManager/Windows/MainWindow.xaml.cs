@@ -135,7 +135,7 @@ namespace DownloadManagerH.Windows
             }
         }
 
-        private async void btnAdd_Click(object sender, RoutedEventArgs e)
+        private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new InputDialog();
             if (dialog.ShowDialog() == true)
@@ -153,20 +153,18 @@ namespace DownloadManagerH.Windows
                 };
                 AddDownloadWithGroupSync(item);
                 
-                // اگر کاربر دکمه شروع را زده باشد، دانلود را شروع کن
+                // اگر کاربر دکمه شروع را زده باشد، دانلود را شروع کن و به پنجره جزئیات برو
                 if (dialog.ShouldStartDownload)
                 {
-                    var success = await manager.StartDownloadAsync(item);
+                    _= manager.StartDownloadAsync(item);
                     dgDownloads.Items.Refresh();
                     OnPropertyChanged(nameof(AverageSpeed));
                     
-                    // نمایش پیام بر اساس نتیجه
-                    if (!success)
-                    {
-                        // پیام خطا قبلاً در DownloadManager نمایش داده شده است
-                        // فقط UI را بروزرسانی می‌کنیم
-                    }
+                    // نمایش پنجره جزئیات دانلود
+                    var detailsWindow = new DownloadDetailsWindow(item);
+                    detailsWindow.Show();
                 }
+                // دیالوگ خودکار بسته شده است (ShowDialog منتظر مانده بود تا DialogResult تنظیم شود)
             }
         }
 
