@@ -310,6 +310,35 @@ namespace DownloadManagerH.Models
     }
 
     /// <summary>
+    /// فیلتر مسدودسازی فایل‌های HTML
+    /// </summary>
+    public class HtmlFileFilter : IDownloadFilter
+    {
+        public string Name => "HTML File Filter";
+        public bool IsEnabled { get; set; } = true;
+        public bool IsBlocking => true;
+
+        public FilterResult ShouldIntercept(DownloadFilterContext context)
+        {
+            if (!IsEnabled)
+                return new FilterResult { ShouldIntercept = true, Reason = "Filter disabled", FilterName = Name };
+
+            // استفاده از متد ShouldBlockHtmlDownload از Settings
+            if (Models.Settings.ShouldBlockHtmlDownload(context.Url, context.FileName))
+            {
+                return new FilterResult
+                {
+                    ShouldIntercept = false,
+                    Reason = "HTML files are blocked by settings",
+                    FilterName = Name
+                };
+            }
+
+            return new FilterResult { ShouldIntercept = true, Reason = "File is not HTML or HTML blocking is disabled", FilterName = Name };
+        }
+    }
+
+    /// <summary>
     /// فیلتر الگوی URL
     /// </summary>
     public class UrlPatternFilter : IDownloadFilter

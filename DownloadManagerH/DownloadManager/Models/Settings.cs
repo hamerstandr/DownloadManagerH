@@ -117,6 +117,11 @@ namespace DownloadManagerH.Models
         /// </summary>
         public static long MaxFileSizeForInterception { get; set; } = 0;
 
+        /// <summary>
+        /// عدم دانلود فایل‌های HTML (پیش‌فرض: فعال)
+        /// </summary>
+        public static bool BlockHtmlDownloads { get; set; } = true;
+
         // ==================== مسیرها ====================
         public static string DataDirectory => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -217,6 +222,54 @@ namespace DownloadManagerH.Models
         }
 
         /// <summary>
+        /// بررسی اینکه آیا فایل HTML باید مسدود شود
+        /// </summary>
+        public static bool ShouldBlockHtmlDownload(string url, string? fileName = null)
+        {
+            if (!BlockHtmlDownloads)
+                return false;
+
+            try
+            {
+                // بررسی پسوند فایل
+                var extension = string.IsNullOrEmpty(fileName) 
+                    ? GetExtensionFromUrl(url) 
+                    : Path.GetExtension(fileName)?.ToLower().TrimStart('.');
+
+                if (extension == "html" || extension == "htm")
+                    return true;
+
+                // بررسی Content-Type از URL (اگر در URL مشخص شده باشد)
+                if (url.Contains("text/html", StringComparison.OrdinalIgnoreCase))
+                    return true;
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// استخراج پسوند از URL
+        /// </summary>
+        private static string? GetExtensionFromUrl(string url)
+        {
+            try
+            {
+                var uri = new Uri(url);
+                var path = uri.AbsolutePath;
+                var fileName = Path.GetFileName(path);
+                return Path.GetExtension(fileName)?.ToLower().TrimStart('.');
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// ذخیره تنظیمات در فایل JSON
         /// </summary>
         public static void Save()
@@ -248,6 +301,7 @@ namespace DownloadManagerH.Models
                         UrlPatterns = UrlPatterns,
                         MinFileSizeForInterception = MinFileSizeForInterception,
                         MaxFileSizeForInterception = MaxFileSizeForInterception,
+                        BlockHtmlDownloads = BlockHtmlDownloads,
                         MaxConcurrentDownloads = MaxConcurrentDownloadsLimit,
                         EnableClipboardMonitoring = MonitorClipboard,
                         EnableDownloadInterception = true
@@ -305,6 +359,7 @@ namespace DownloadManagerH.Models
                         UrlPatterns = settingsData.UrlPatterns ?? new List<string>();
                         MinFileSizeForInterception = settingsData.MinFileSizeForInterception;
                         MaxFileSizeForInterception = settingsData.MaxFileSizeForInterception;
+                        BlockHtmlDownloads = settingsData.BlockHtmlDownloads;
                         
                         // Sync new properties if they exist in loaded data
                         if (settingsData.MaxConcurrentDownloads != 0)
@@ -346,6 +401,7 @@ namespace DownloadManagerH.Models
                 UrlPatterns = new List<string>();
                 MinFileSizeForInterception = 100 * 1024;
                 MaxFileSizeForInterception = 0;
+                BlockHtmlDownloads = true;
                 
                 DownloadableExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -391,6 +447,7 @@ namespace DownloadManagerH.Models
         public List<string> UrlPatterns { get; set; } = new List<string>();
         public long MinFileSizeForInterception { get; set; } = 102400;
         public long MaxFileSizeForInterception { get; set; } = 0;
+        public bool BlockHtmlDownloads { get; set; } = true;
         
         // Properties for Native Messaging Host
         public int MaxConcurrentDownloads { get; set; } = 5;
