@@ -1,27 +1,76 @@
 ```
 # Build artifacts
-*.obj
+bin/
+obj/
 *.exe
 *.dll
 *.pdb
 *.userprefs
+*.cache
+*.compiled
+*.nupkg
+*.snupkg
+*.zip
+*.tar.gz
 
 # Dependencies
 packages/
-bin/
-obj/
+node_modules/
+lib/
+vendor/
 
 # Logs
 *.log
+*.userprefs
 
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
+# Environment specific
 .vs/
 .vshost.exe
 .user
-.suo
+.userosscache
+.iuser
+.userprofile
+*.suo
+*.userprefs
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Testing
+TestResults/
+coverage/
+*.cover
+*.gcda
+*.gcno
+*.profdata
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Configuration
+appsettings.Development.json
+appsettings.Production.json
+secrets.*
+.env
+.env.local
+.env.*
+!sample.env
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.cache
+*.cached
 ```
