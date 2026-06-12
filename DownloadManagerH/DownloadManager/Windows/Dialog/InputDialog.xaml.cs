@@ -101,7 +101,7 @@ namespace DownloadManagerH.Windows.Dialog
             {
                 ShouldStartDownload = true;
                 DialogResult = true;
-                Close();
+                Close(); // بستن دیالوگ پس از تأیید
             }
         }
         
