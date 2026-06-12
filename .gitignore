@@ -1,39 +1,33 @@
-```gitignore
+```
 # Build artifacts
 bin/
 obj/
-*.exe
 *.dll
+*.exe
 *.pdb
-*.userprefs
-*.cache
-*.log
+*.nupkg
+*.snupkg
 
 # Dependencies
 packages/
 node_modules/
+.nuget/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+*.env.*
 
 # Editors
-.vs/
-.ReSharper*/
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
+.vscode/
+.idea/
+*.swp
+*.tmp
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
-ehthumbs.db
-Icon?
 ```
-
-Wait, let me reconsider this. The changes are only XAML and XAML.cs files, which are source code files. According to rule #6, if the change list contains ONLY source files and NO build artifacts, dependencies, or temp files, I should output an EMPTY .gitignore.
-
-The files changed are:
-- DownloadManagerH/DownloadManager/Windows/MainWindow.xaml (XAML source file)
-- DownloadManagerH/DownloadManager/Windows/MainWindow.xaml.cs (C# source file)
-
-These are both source code files, not build artifacts or dependencies.
-
-(empty - no output)

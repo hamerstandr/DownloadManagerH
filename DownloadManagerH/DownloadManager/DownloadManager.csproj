@@ -20,12 +20,14 @@
 
   <ItemGroup>
     <Content Include="icons8_chevron_down.ico" />
-    <None Include="icons8_chevron_down.ico" />
+    <Resource Include="icons8_chevron_down.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="icons8_chevron_down2.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
     <Resource Include="icons8_chevron_down_480px.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 
