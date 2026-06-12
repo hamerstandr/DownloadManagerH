@@ -221,9 +221,53 @@ namespace DownloadManagerH.Models
             {
                 item.Status = DownloadStatus.Downloading;
                 EnsureDataFolders();
+                
+                // بررسی وجود فایل نهایی - اگر فایل از قبل وجود دارد، از کاربر بپرس
+                string finalFile = Path.Combine(item.SavePath, item.FileName);
+                if (File.Exists(finalFile) && item.Parts.Count == 0)
+                {
+                    // فایل از قبل وجود دارد - نمایش دیالوگ تعارض
+                    string newFileName = "";
+                    var result = System.Windows.Application.Current?.Dispatcher?.Invoke(() =>
+                    {
+                        return FileConflictDialog.Show(item, ref newFileName);
+                    }) ?? FileConflictResult.Cancel;
+                    
+                    if (result == FileConflictResult.Cancel)
+                    {
+                        item.Status = DownloadStatus.Stopped;
+                        downloadSemaphore.Release();
+                        return false;
+                    }
+                    else if (result == FileConflictResult.Rename && !string.IsNullOrEmpty(newFileName))
+                    {
+                        // تغییر نام فایل
+                        item.FileName = newFileName;
+                        finalFile = Path.Combine(item.SavePath, item.FileName);
+                    }
+                    else if (result == FileConflictResult.Overwrite)
+                    {
+                        // حذف فایل قبلی
+                        try
+                        {
+                            File.Delete(finalFile);
+                            _logger.LogInfo($"فایل قبلی حذف شد: {finalFile}", new { FileName = item.FileName });
+                        }
+                        catch (Exception ex)
+                        {
+                            var errorMsg = $"خطا در حذف فایل قبلی: {ex.Message}";
+                            currentDownloadErrors.Add(errorMsg);
+                            _logger.LogError(errorMsg, ex, new { FinalFile = finalFile });
+                            item.Status = DownloadStatus.Failed;
+                            downloadSemaphore.Release();
+                            ShowDownloadErrorSummary(item);
+                            return false;
+                        }
+                    }
+                }
+                
                 // مسیر موقت برای دانلود
                 string tempFile = Path.Combine(Settings.TempDirectory, item.FileName);
-                string finalFile = Path.Combine(item.SavePath, item.FileName);
                 
                 // محاسبه مقدار دانلود شده از بخش‌های موجود (برای ادامه دانلود)
                 if (item.Parts.Count > 0 && item.DownloadedBytes == 0)
@@ -390,7 +434,14 @@ namespace DownloadManagerH.Models
                         var errorMsg = $"انتقال فایل به مقصد با خطا مواجه شد: {ex.Message}";
                         currentDownloadErrors.Add(errorMsg);
                         _logger.LogError(errorMsg, ex, new { TempFile = tempFile, FinalFile = finalFile });
+                        
+                        // در صورت خطا در انتقال فایل، وضعیت دانلود را Failed نکنید تا بتوان دوباره شروع کرد
+                        // فقط پیام خطا را نمایش بده و فایل موقت را حفظ کن
                         ShowDownloadErrorSummary(item);
+                        
+                        // فایل موقت را حذف نکن تا امکان ادامه دانلود وجود داشته باشد
+                        _logger.LogWarning($"فایل موقت حفظ شد: {tempFile}", new { TempFile = tempFile });
+                        
                         return false;
                     }
                     //todo show windows complet
@@ -403,7 +454,19 @@ namespace DownloadManagerH.Models
                     // اگر دانلود متوقف شده، وضعیت را تغییر نده
                     if (item.Status != DownloadStatus.Paused && item.Status != DownloadStatus.Stopped)
                     {
-                        item.Status = DownloadStatus.Failed;
+                        // در صورتی که خطا مربوط به پیدا نشدن فایل موقت است، وضعیت را به Failed تغییر نده
+                        // تا کاربر بتواند دوباره شروع کند
+                        var hasMissingTempFileError = currentDownloadErrors.Any(e => e.Contains("Could not find file") || e.Contains("فایل موقت"));
+                        if (!hasMissingTempFileError)
+                        {
+                            item.Status = DownloadStatus.Failed;
+                        }
+                        else
+                        {
+                            // حفظ وضعیت برای امکان شروع مجدد
+                            item.Status = DownloadStatus.Paused;
+                            _logger.LogWarning($"وضعیت دانلود به Paused تغییر یافت تا امکان شروع مجدد وجود داشته باشد", new { FileName = item.FileName });
+                        }
                     }
                     var failedParts = item.Parts.Count(p => p.Status == PartStatus.Failed);
                     var errorMsg = $"دانلود فایل '{item.FileName}' ناموفق بود. {failedParts} بخش از {item.Parts.Count} بخش با خطا مواجه شد.";
@@ -420,7 +483,19 @@ namespace DownloadManagerH.Models
             }
             catch (Exception ex)
             {
-                item.Status = DownloadStatus.Failed;
+                // در صورت خطای غیرمنتظره، بررسی کن که آیا خطا مربوط به فایل موقت است
+                var hasMissingTempFileError = ex.Message.Contains("Could not find file") || ex.Message.Contains("فایل موقت");
+                if (!hasMissingTempFileError)
+                {
+                    item.Status = DownloadStatus.Failed;
+                }
+                else
+                {
+                    // حفظ وضعیت برای امکان شروع مجدد
+                    item.Status = DownloadStatus.Paused;
+                    _logger.LogWarning($"وضعیت دانلود به Paused تغییر یافت تا امکان شروع مجدد وجود داشته باشد", new { FileName = item.FileName });
+                }
+                
                 var errorMsg = $"خطای غیرمنتظره در دانلود: {ex.Message}";
                 currentDownloadErrors.Add(errorMsg);
                 _logger.LogError(errorMsg, ex, item);
