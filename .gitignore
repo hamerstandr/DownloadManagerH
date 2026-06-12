@@ -1,27 +1,21 @@
+
+# User-specific files
+**/UserSettings.json
+**/*.userprefs
+**/*.userosscache
+**/*.sln.docstates
+
+# Testing
+TestResults/
+
+# Localized resources
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ARM/
+**/ARM64/
 ```
-# Build artifacts
-*.obj
-*.exe
-*.dll
-*.pdb
-*.userprefs
-
-# Dependencies
-packages/
-bin/
-obj/
-
-# Logs
-*.log
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vs/
-.vshost.exe
-.user
-.suo
-```
+**/.vs/
+**/obj/
+**/publish/
