@@ -94,6 +94,7 @@
                     <MenuItem Header="▶️ شروع" ToolTip="شروع دانلود" Name="menuStart" Click="btnStart_Click"/>
                     <MenuItem Header="⏸️ توقف" ToolTip="توقف دانلود" Name="menuPause" Click="btnPause_Click"/>
                     <MenuItem Header="▶️ ادامه" ToolTip="ادامه دانلود" Name="menuResume" Click="btnResume_Click"/>
+                    <MenuItem Header="🔄 دانلود مجدد" ToolTip="دانلود مجدد" Name="menuRetry" Click="MenuRetry_Click"/>
                     <MenuItem Header="❌ حذف" ToolTip="حذف دانلود" Name="menuRemove" Click="btnRemove_Click"/>
                     <MenuItem Header="📂 باز کردن پوشه" ToolTip="باز کردن پوشه" Name="menuOpenFolder" Click="MenuOpenFolder_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>
                     <MenuItem Header="📄 باز کردن فایل" ToolTip="باز کردن فایل" Name="menuOpenFile" Click="MenuOpenFile_Click" IsEnabled="{Binding Status, Converter={StaticResource CompletedOnlyConverter}}"/>

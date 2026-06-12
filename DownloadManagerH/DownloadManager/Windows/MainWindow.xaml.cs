@@ -487,6 +487,36 @@ namespace DownloadManagerH.Windows
             }
         }
 
+        private async void MenuRetry_Click(object sender, RoutedEventArgs e)
+        {
+            if (dgDownloads.SelectedItem is DownloadItem item)
+            {
+                if (item.Status != DownloadStatus.Failed && item.Status != DownloadStatus.Completed)
+                {
+                    CustomMessageBox.Show("این گزینه فقط برای دانلودهای ناموفق یا تکمیل شده کاربرد دارد.", "دانلود مجدد", CustomMessageBoxType.Ok);
+                    return;
+                }
+
+                var result = CustomMessageBox.Show($"آیا می‌خواهید دانلود \"{item.FileName}\" را مجدداً شروع کنید؟", "دانلود مجدد", CustomMessageBoxType.YesNo);
+                if (result != CustomMessageBoxResult.Yes) return;
+
+                // ریست کردن وضعیت دانلود
+                item.Progress = 0;
+                item.DownloadedBytes = 0;
+                item.Speed = "";
+                item.RetryCount = 0;
+                item.LastRetryTime = null;
+                item.Status = DownloadStatus.Pending;
+
+                // شروع مجدد دانلود
+                var win = new DownloadDetailsWindow(item);
+                win.Show();
+                var success = await manager.StartDownloadAsync(item);
+                dgDownloads.Items.Refresh();
+                OnPropertyChanged(nameof(AverageSpeed));
+            }
+        }
+
         private void MenuExit_Click(object sender, RoutedEventArgs e)
         {
             var result = CustomMessageBox.Show("آیا مطمئن هستید که می‌خواهید برنامه را ببندید؟", "خروج", CustomMessageBoxType.OKCancel);
