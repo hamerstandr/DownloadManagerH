@@ -22,8 +22,8 @@
         </Grid.RowDefinitions>
         <!-- File Menu -->
         <Menu Grid.Row="0" Margin="0,0,0,5">
-            <MenuItem Header="فایل">
-                <MenuItem Header="مدیریت گروه‌ها/صف‌ها" Click="MenuGroupManager_Click"/>
+            <MenuItem Header="فایل" Icon="{StaticResource FileIcon}">
+                <MenuItem Header="مدیریت گروه‌ها/صف‌ها" Click="MenuGroupManager_Click" />
                 <Separator/>
                 <MenuItem Header="خروجی لیست دانلودها" Click="btnExport_Click"/>
                 <MenuItem Header="ورودی لیست دانلودها" Click="btnImport_Click"/>

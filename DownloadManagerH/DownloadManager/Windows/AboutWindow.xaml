@@ -87,10 +87,15 @@
 
         <!-- فوتر -->
         <StackPanel Grid.Row="2" Background="#FFE0E0E0" Margin="10">
-            <Button Content="تأیید" 
+            <Button ToolTip="تأیید" 
                     Width="100" 
                     HorizontalAlignment="Center"
-                    Click="OkButton_Click"/>
+                    Click="OkButton_Click">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="20" Height="20" Source="{StaticResource CheckIcon}"/>
+                    <TextBlock Text="تایید" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

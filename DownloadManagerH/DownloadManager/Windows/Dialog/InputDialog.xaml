@@ -1,8 +1,8 @@
 <Window x:Class="DownloadManagerH.Windows.Dialog.InputDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ورودی" Height="430" Width="520" 
-        ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="افزودن دانلود جدید" Height="430" Width="520" 
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Icon="{StaticResource addIcon}">
     <Window.ToolTip>
         افزودن دانلود جدید
     </Window.ToolTip>
@@ -15,7 +15,7 @@
             <TabItem>
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <Image Width="18" Height="18" Source="{StaticResource SmileyIcon}"/>
+                        <Image Width="18" Height="18" Source="{StaticResource infoIcon}"/>
                         <TextBlock Text="اطلاعات دانلود" Margin="5,0,0,0"/>
                     </StackPanel>
                 </TabItem.Header>
@@ -85,7 +85,7 @@
                 </StackPanel>
             </Button>
             <Button ToolTip="انصراف" Width="100" Click="BtnCancel_Click" Background="#e57373" Foreground="White">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
                     <Image Width="20" Height="20" Source="{StaticResource CrossIcon}"/>
                     <TextBlock Text="انصراف" Margin="5,0,0,0" Foreground="White"/>
                 </StackPanel>

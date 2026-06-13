@@ -160,13 +160,13 @@
                                     <TextBlock Text="{Binding FileName}" VerticalAlignment="Center"/>
                                     <Button ToolTip="بالا بردن اولویت" Width="100" Height="38" Margin="5,0,0,0" Click="BtnUpPriority_Click">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Image Width="14" Height="14" Source="{StaticResource CheckIcon}"/>
+                                            <Image Width="14" Height="14" Source="{StaticResource upIcon}"/>
                                             <TextBlock Text="بالا" Margin="5,0,0,0" Foreground="White"/>
                                         </StackPanel>
                                     </Button>
                                     <Button ToolTip="پایین آوردن اولویت" Width="100" Height="38" Margin="5,0,0,0" Click="BtnDownPriority_Click">
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Image Width="14" Height="14" Source="{StaticResource PauseIcon}"/>
+                                            <Image Width="14" Height="14" Source="{StaticResource downIcon}"/>
                                             <TextBlock Text="پایین" Margin="5,0,0,0" Foreground="White"/>
                                         </StackPanel>
                                     </Button>

@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="تعارض فایل" Height="280" Width="500" 
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        FontFamily="Segoe UI">
+        FontFamily="Segoe UI"
+        Icon="{StaticResource WarningIcon}">
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,10 +25,10 @@
         
         <!-- دکمه‌ها -->
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button x:Name="btnOverwrite" ToolTip="جایگزینی فایل" Width="120" Margin="0,0,10,0" Click="BtnOverwrite_Click" Style="{StaticResource ToolbarButtonStyle}">
+            <Button x:Name="btnOverwrite" ToolTip="جایگزینی فایل"  Margin="0,0,10,0" Click="BtnOverwrite_Click" Style="{StaticResource ToolbarButtonStyle}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Image Width="20" Height="20" Source="{StaticResource CrossIcon}"/>
-                    <TextBlock Text="جایگزینی (Overwrite)" Margin="5,0,0,0"/>
+                    <Image Width="20" Height="20" Source="{StaticResource overIcon}"/>
+                    <TextBlock Text="جایگزینی (Overwrite)" />
                 </StackPanel>
             </Button>
             <Button x:Name="btnRename" ToolTip="تغییر نام" Width="120" Margin="0,0,10,0" Click="BtnRename_Click" Style="{StaticResource ToolbarButtonStyle}">
@@ -38,7 +39,7 @@
             </Button>
             <Button x:Name="btnCancel" ToolTip="انصراف" Width="120" Click="BtnCancel_Click" Style="{StaticResource ToolbarButtonStyle}">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Image Width="20" Height="20" Source="{StaticResource CloseIcon}"/>
+                    <Image Width="20" Height="20" Source="{StaticResource CrossIcon}"/>
                     <TextBlock Text="انصراف" Margin="5,0,0,0"/>
                 </StackPanel>
             </Button>

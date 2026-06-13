@@ -493,7 +493,7 @@ namespace DownloadManagerH.Windows
             {
                 if (item.Status != DownloadStatus.Failed && item.Status != DownloadStatus.Completed)
                 {
-                    CustomMessageBox.Show("این گزینه فقط برای دانلودهای ناموفق یا تکمیل شده کاربرد دارد.", "دانلود مجدد", CustomMessageBoxType.Ok);
+                    CustomMessageBox.Show("این گزینه فقط برای دانلودهای ناموفق یا تکمیل شده کاربرد دارد.", "دانلود مجدد", CustomMessageBoxType.OK);
                     return;
                 }
 

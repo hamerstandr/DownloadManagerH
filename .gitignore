@@ -63,4 +63,14 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+# Localized resources
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+**/ARM/
+**/ARM64/
 ```
+**/.vs/
+**/obj/
+**/publish/

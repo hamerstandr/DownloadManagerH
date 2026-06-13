@@ -125,8 +125,18 @@
             </Grid>
         </ScrollViewer>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0" Grid.Row="1" VerticalAlignment="Bottom">
-            <Button Content="💾 ذخیره" Width="120" Margin="0,0,10,0" Click="BtnSave_Click" Background="#4caf50" Foreground="White"/>
-            <Button Content="❌ انصراف" Width="120" Click="BtnCancel_Click" Background="#e57373" Foreground="White"/>
+            <Button ToolTip="💾 ذخیره" Width="120" Margin="0,0,10,0" Click="BtnSave_Click" Background="#4caf50" Foreground="White">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Width="20" Height="20" Source="{StaticResource SaveIcon}"/>
+                    <TextBlock Text="ذخیره" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+            <Button ToolTip="❌ انصراف" Width="120" Click="BtnCancel_Click" Foreground="White">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+                    <Image Width="20" Height="20" Source="{StaticResource CrossIcon}"/>
+                    <TextBlock Text="انصراف" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
         
     </Grid>

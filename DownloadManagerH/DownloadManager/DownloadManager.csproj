@@ -19,7 +19,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="add_48px.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="icons8_chevron_down.ico" />
+    <Resource Include="add_48px.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="icons8_chevron_down.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

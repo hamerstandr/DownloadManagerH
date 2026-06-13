@@ -2,9 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:DownloadManagerH.Windows"
-        xmlns:models="clr-namespace:DownloadManagerH.Models" xmlns:controls="clr-namespace:DownloadManager.Controls"
+        xmlns:models="clr-namespace:DownloadManagerH.Models"
+        xmlns:controls="clr-namespace:DownloadManager.Controls"
         Title="جزئیات دانلود" Height="580" Width="600" 
-        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" FlowDirection="RightToLeft">
+        ResizeMode="NoResize" WindowStartupLocation="CenterScreen" FlowDirection="RightToLeft" Icon="/icons8_chevron_down.ico">
     <Window.ToolTip>
         جزئیات دانلود
     </Window.ToolTip>

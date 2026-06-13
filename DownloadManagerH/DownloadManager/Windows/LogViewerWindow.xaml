@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="نمایشگر لاگ‌ها - دانلود منجر حامد" 
-        Height="600" Width="1000" 
+        Height="600" Width="1100" 
         Background="#f7f7fa" 
         Icon="/icons8_chevron_down_480px.png" 
         FlowDirection="RightToLeft"
@@ -114,7 +114,7 @@
             <Button x:Name="btnAutoScroll" Content="📜 پیمایش خودکار" Padding="10,5" Margin="0,0,10,0" Click="BtnAutoScroll_Click" ToolTip="فعال/غیرفعال کردن پیمایش خودکار"/>
             <Separator Margin="10,0"/>
             <TextBlock Text="تعداد لاگ‌ها:" VerticalAlignment="Center" Margin="0,0,5,0" FontWeight="Bold"/>
-            <TextBlock x:Name="lblLogCount" Text="0" VerticalAlignment="Center" FontWeight="Bold" Foreground="#007bff"/>
+            <TextBlock x:Name="lblLogCount" Text="0" VerticalAlignment="Center" FontWeight="Bold" Foreground="#007bff" Margin="0,0,5,0"/>
         </StackPanel>
 
         <!-- لیست لاگ‌ها -->
@@ -162,7 +162,7 @@
         </ListView>
 
         <!-- نوار وضعیت -->
-        <StatusBar Grid.Row="3" Height="30" Background="#f8f9fa" BorderBrush="#d1d3e2" BorderThickness="0,1,0,0">
+        <StatusBar Grid.Row="3" Height="48" Background="#f8f9fa" BorderBrush="#d1d3e2" BorderThickness="0,1,0,0">
             <StatusBarItem>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="آخرین بروزرسانی:" Margin="0,0,5,0"/>
