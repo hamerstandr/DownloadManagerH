@@ -333,7 +333,7 @@ namespace DownloadManagerH.Windows
 
         private void btnStartup_Click(object sender, RoutedEventArgs e)
         {
-            var exePath = Assembly.GetExecutingAssembly().Location;
+            var exePath = Environment.ProcessPath ?? throw new InvalidOperationException("نمی‌توان مسیر فایل اجرایی برنامه را تشخیص داد.");
             if (!StartupHelper.IsInStartup())
             {
                 StartupHelper.AddToStartup(exePath);

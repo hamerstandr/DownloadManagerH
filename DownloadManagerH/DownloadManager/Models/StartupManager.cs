@@ -1,7 +1,6 @@
 ﻿using DownloadManagerH.Windows.Dialog;
 using Microsoft.Win32;
 using System;
-using System.Reflection;
 
 namespace DownloadManagerH.Models
 {
@@ -17,7 +16,7 @@ namespace DownloadManagerH.Models
         {
             try
             {
-                string path = Assembly.GetExecutingAssembly().Location;
+                string path = Environment.ProcessPath ?? throw new InvalidOperationException("نمی‌توان مسیر فایل اجرایی برنامه را تشخیص داد.");
 
                 using RegistryKey? key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true)??throw new InvalidOperationException("نمی‌توان به کلید رجیستری دسترسی پیدا کرد.");
                 if (enable)

@@ -575,9 +575,9 @@ namespace DownloadManagerH.Models
 
         private static async Task<string> CalculateFileChecksumAsync(string filePath)
         {
-            using var md5 = MD5.Create();
+            using var sha256 = SHA256.Create();
             using var stream = File.OpenRead(filePath);
-            var hash = await Task.Run(() => md5.ComputeHash(stream));
+            var hash = await Task.Run(() => sha256.ComputeHash(stream));
             return Convert.ToHexString(hash);
         }
 

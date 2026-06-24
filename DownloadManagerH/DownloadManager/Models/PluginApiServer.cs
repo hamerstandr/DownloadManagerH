@@ -33,6 +33,13 @@ namespace DownloadManagerH.Models
         private const int MAX_REQUESTS_PER_MINUTE = 60;
         private const int MAX_PAYLOAD_SIZE = 1024 * 1024; // 1MB
         private const string API_VERSION = "2.0";
+        private static readonly HashSet<string> AllowedCorsOrigins = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "http://127.0.0.1:24680",
+            "http://localhost:24680",
+            "chrome-extension://",
+            "moz-extension://"
+        };
         
         public event EventHandler<PluginEventArgs>? PluginEvent;
         
@@ -124,8 +131,13 @@ namespace DownloadManagerH.Models
             
             try
             {
-                // Set CORS headers
-                response.Headers.Add("Access-Control-Allow-Origin", "*");
+                // Set CORS headers only for trusted local and browser-extension origins.
+                var origin = request.Headers["Origin"];
+                if (IsAllowedCorsOrigin(origin))
+                {
+                    response.Headers.Add("Access-Control-Allow-Origin", origin);
+                    response.Headers.Add("Vary", "Origin");
+                }
                 response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                 response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, User-Agent");
                 
@@ -653,6 +665,17 @@ namespace DownloadManagerH.Models
             }
         }
         
+        private static bool IsAllowedCorsOrigin(string? origin)
+        {
+            if (string.IsNullOrWhiteSpace(origin))
+                return false;
+
+            return AllowedCorsOrigins.Any(allowed =>
+                allowed.EndsWith("://", StringComparison.Ordinal)
+                    ? origin.StartsWith(allowed, StringComparison.OrdinalIgnoreCase)
+                    : string.Equals(origin, allowed, StringComparison.OrdinalIgnoreCase));
+        }
+
         private bool CheckRateLimit(string clientIp)
         {
             lock (_rateLimitLock)
