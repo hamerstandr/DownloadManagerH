@@ -153,19 +153,10 @@ namespace DownloadManagerH.Models
         public bool IsEnabled { get; set; } = true;
         public bool EnableDownloadInterception { get; set; } = true;
         
-        public List<string> ChromeExtensionIds { get; set; } = new()
-        {
-            "chrome-extension://placeholder-chrome-extension-id/"
-        };
+        public List<string> ChromeExtensionIds { get; set; } = new();
         
-        public List<string> EdgeExtensionIds { get; set; } = new()
-        {
-            "extension://placeholder-edge-extension-id/"
-        };
+        public List<string> EdgeExtensionIds { get; set; } = new();
         
-        public List<string> FirefoxExtensionIds { get; set; } = new()
-        {
-            "placeholder-firefox-extension-id@mozilla.org"
-        };
+        public List<string> FirefoxExtensionIds { get; set; } = new();
     }
 }
