@@ -1,9 +1,7 @@
 {
   "name": "com.hameddownloadmanager.host",
   "description": "دانلود منجر حامد - Native Messaging Host",
-  "path": "C:\\Program Files\\DownloadManagerH\\DownloadManager.exe",
+  "path": "${DOWNLOADMANAGERH_EXE_PATH}",
   "type": "stdio",
-  "allowed_extensions": [
-    "your-firefox-extension-id@mozilla.org"
-  ]
+  "allowed_extensions": []
 }

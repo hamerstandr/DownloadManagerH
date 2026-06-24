@@ -37,6 +37,7 @@ namespace DownloadManagerH.Models
         public static string Language { get; set; } = "fa";
         public static string ThemeColor { get; set; } = "#4caf50";
         public static int CountConctionDownloads { get; set; } = 3;
+        public static string PluginApiToken { get; set; } = GenerateApiToken();
         
         public static string DefaultDownloadPath { get; set; } = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
@@ -143,6 +144,11 @@ namespace DownloadManagerH.Models
         /// <summary>
         /// اعمال جهت متن بر اساس زبان
         /// </summary>
+        private static string GenerateApiToken()
+        {
+            return Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+        }
+
         public static FlowDirection GetFlowDirection()
         {
             return Language.ToLower() == "en" 
@@ -248,6 +254,7 @@ namespace DownloadManagerH.Models
                         UrlPatterns = UrlPatterns,
                         MinFileSizeForInterception = MinFileSizeForInterception,
                         MaxFileSizeForInterception = MaxFileSizeForInterception,
+                        PluginApiToken = PluginApiToken,
                         MaxConcurrentDownloads = MaxConcurrentDownloadsLimit,
                         EnableClipboardMonitoring = MonitorClipboard,
                         EnableDownloadInterception = true
@@ -305,6 +312,9 @@ namespace DownloadManagerH.Models
                         UrlPatterns = settingsData.UrlPatterns ?? new List<string>();
                         MinFileSizeForInterception = settingsData.MinFileSizeForInterception;
                         MaxFileSizeForInterception = settingsData.MaxFileSizeForInterception;
+                        PluginApiToken = string.IsNullOrWhiteSpace(settingsData.PluginApiToken)
+                            ? GenerateApiToken()
+                            : settingsData.PluginApiToken;
                         
                         // Sync new properties if they exist in loaded data
                         if (settingsData.MaxConcurrentDownloads != 0)
@@ -346,6 +356,7 @@ namespace DownloadManagerH.Models
                 UrlPatterns = new List<string>();
                 MinFileSizeForInterception = 100 * 1024;
                 MaxFileSizeForInterception = 0;
+                PluginApiToken = GenerateApiToken();
                 
                 DownloadableExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -391,6 +402,7 @@ namespace DownloadManagerH.Models
         public List<string> UrlPatterns { get; set; } = new List<string>();
         public long MinFileSizeForInterception { get; set; } = 102400;
         public long MaxFileSizeForInterception { get; set; } = 0;
+        public string PluginApiToken { get; set; } = string.Empty;
         
         // Properties for Native Messaging Host
         public int MaxConcurrentDownloads { get; set; } = 5;

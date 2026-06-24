@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace DownloadManagerH.Models
         private readonly int _port;
         private readonly string _ipAddress;
         private bool _isRunning = false;
-        private readonly Dictionary<string, DateTime> _rateLimitTracker;
+        private readonly Dictionary<string, Queue<DateTime>> _rateLimitTracker;
         private readonly object _rateLimitLock = new object();
         
         // Configuration
@@ -139,7 +140,7 @@ namespace DownloadManagerH.Models
                     response.Headers.Add("Vary", "Origin");
                 }
                 response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, User-Agent");
+                response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, User-Agent, X-DMH-Api-Token");
                 
                 // Handle preflight requests
                 if (request.HttpMethod == "OPTIONS")
@@ -149,8 +150,20 @@ namespace DownloadManagerH.Models
                     return;
                 }
                 
+                if (!IsLoopbackRequest(request))
+                {
+                    await SendErrorResponse(response, 403, "Only loopback requests are allowed");
+                    return;
+                }
+
+                if (!IsAuthorizedRequest(request))
+                {
+                    await SendErrorResponse(response, 401, "Missing or invalid API token");
+                    return;
+                }
+
                 // Rate limiting
-                if (!CheckRateLimit(request.RemoteEndPoint.Address.ToString()))
+                if (!CheckRateLimit(GetRateLimitKey(request)))
                 {
                     await SendErrorResponse(response, 429, "Rate limit exceeded");
                     return;
@@ -422,15 +435,13 @@ namespace DownloadManagerH.Models
                 if (string.IsNullOrWhiteSpace(link.Url))
                     continue;
                 
-                if (Uri.TryCreate(link.Url, UriKind.Absolute, out var uri) &&
-                    (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                if (!IsSafeDownloadUrl(link.Url, out var reason))
                 {
-                    validLinks.Add(link);
+                    _logger.LogWarning($"Invalid URL rejected: {reason}");
+                    continue;
                 }
-                else
-                {
-                    _logger.LogWarning($"Invalid URL rejected: {link.Url}");
-                }
+
+                validLinks.Add(link);
             }
             
             return validLinks;
@@ -676,39 +687,136 @@ namespace DownloadManagerH.Models
                     : string.Equals(origin, allowed, StringComparison.OrdinalIgnoreCase));
         }
 
-        private bool CheckRateLimit(string clientIp)
+        private bool IsAuthorizedRequest(HttpListenerRequest request)
+        {
+            if (request.HttpMethod == "OPTIONS")
+                return true;
+
+            var configuredToken = Settings.PluginApiToken;
+            if (string.IsNullOrWhiteSpace(configuredToken))
+                return false;
+
+            var providedToken = request.Headers["X-DMH-Api-Token"];
+            if (string.IsNullOrWhiteSpace(providedToken))
+                return false;
+
+            var configuredBytes = Encoding.UTF8.GetBytes(configuredToken);
+            var providedBytes = Encoding.UTF8.GetBytes(providedToken);
+            return configuredBytes.Length == providedBytes.Length &&
+                   CryptographicOperations.FixedTimeEquals(configuredBytes, providedBytes);
+        }
+
+        private bool IsLoopbackRequest(HttpListenerRequest request)
+        {
+            var address = request.RemoteEndPoint?.Address;
+            return address != null && IPAddress.IsLoopback(address);
+        }
+
+        private string GetRateLimitKey(HttpListenerRequest request)
+        {
+            var origin = request.Headers["Origin"] ?? "no-origin";
+            var tokenHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Settings.PluginApiToken ?? string.Empty)))[..16];
+            return $"{request.RemoteEndPoint.Address}|{origin}|{tokenHash}";
+        }
+
+        private bool CheckRateLimit(string key)
         {
             lock (_rateLimitLock)
             {
                 var now = DateTime.UtcNow;
-                var oneMinuteAgo = now.AddMinutes(-1);
-                
-                // Clean old entries
-                var keysToRemove = _rateLimitTracker
-                    .Where(kvp => kvp.Value < oneMinuteAgo)
-                    .Select(kvp => kvp.Key)
-                    .ToList();
-                
-                foreach (var key in keysToRemove)
+                var windowStart = now.AddMinutes(-1);
+
+                if (!_rateLimitTracker.TryGetValue(key, out var timestamps))
                 {
-                    _rateLimitTracker.Remove(key);
+                    timestamps = new Queue<DateTime>();
+                    _rateLimitTracker[key] = timestamps;
                 }
-                
-                // Count requests from this IP in the last minute
-                var requestCount = _rateLimitTracker.Count(kvp => kvp.Key.StartsWith(clientIp));
-                
-                if (requestCount >= MAX_REQUESTS_PER_MINUTE)
+
+                while (timestamps.Count > 0 && timestamps.Peek() < windowStart)
                 {
-                    _logger.LogWarning($"Rate limit exceeded for IP: {clientIp}");
+                    timestamps.Dequeue();
+                }
+
+                if (timestamps.Count >= MAX_REQUESTS_PER_MINUTE)
                     return false;
-                }
-                
-                // Add current request
-                _rateLimitTracker[$"{clientIp}_{now.Ticks}"] = now;
+
+                timestamps.Enqueue(now);
                 return true;
             }
         }
-        
+
+        private bool IsSafeDownloadUrl(string url, out string reason)
+        {
+            reason = string.Empty;
+
+            if (url.Length > 4096)
+            {
+                reason = "URL length exceeds 4096 characters";
+                return false;
+            }
+
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+                (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            {
+                reason = $"unsupported scheme or malformed URL: {url}";
+                return false;
+            }
+
+            if (uri.UserInfo.Length > 0)
+            {
+                reason = $"embedded credentials are not allowed: {uri.Host}";
+                return false;
+            }
+
+            if (!Settings.IsDomainAllowed(url))
+            {
+                reason = $"blocked by domain policy: {uri.Host}";
+                return false;
+            }
+
+            if (IsPrivateOrLoopbackHost(uri.Host))
+            {
+                reason = $"private or loopback host is not allowed: {uri.Host}";
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsPrivateOrLoopbackHost(string host)
+        {
+            if (IPAddress.TryParse(host, out var ipAddress))
+                return IsPrivateOrLoopbackAddress(ipAddress);
+
+            return host.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+                   host.EndsWith(".localhost", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsPrivateOrLoopbackAddress(IPAddress ipAddress)
+        {
+            if (IPAddress.IsLoopback(ipAddress))
+                return true;
+
+            if (ipAddress.AddressFamily == AddressFamily.InterNetwork)
+            {
+                var bytes = ipAddress.GetAddressBytes();
+                return bytes[0] == 10 ||
+                       (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) ||
+                       (bytes[0] == 192 && bytes[1] == 168) ||
+                       (bytes[0] == 169 && bytes[1] == 254);
+            }
+
+            if (ipAddress.AddressFamily == AddressFamily.InterNetworkV6)
+            {
+                var bytes = ipAddress.GetAddressBytes();
+                return ipAddress.IsIPv6LinkLocal ||
+                       ipAddress.IsIPv6SiteLocal ||
+                       (bytes.Length > 0 && (bytes[0] & 0xfe) == 0xfc);
+            }
+
+            return false;
+        }
+
         private static async Task SendJsonResponse(HttpListenerResponse response, int statusCode, object data)
         {
             response.StatusCode = statusCode;
