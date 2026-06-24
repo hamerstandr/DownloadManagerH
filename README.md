@@ -49,9 +49,9 @@
 
 | مرورگر | وضعیت | مسیر فایل‌ها |
 |--------|-------|-------------|
-| **Google Chrome** | ✅ آماده | `DownloadManager/Extensions/Chrome/` |
-| **Microsoft Edge** | ✅ آماده | `DownloadManager/Extensions/Edge/` |
-| **Mozilla Firefox** | ✅ آماده | `DownloadManager/Extensions/Firefox/` |
+| **Google Chrome** | ✅ آماده | `DownloadManagerH/DownloadManager/Extensions/Chrome/` |
+| **Microsoft Edge** | ✅ آماده | `DownloadManagerH/DownloadManager/Extensions/Edge/` |
+| **Mozilla Firefox** | ✅ آماده | `DownloadManagerH/DownloadManager/Extensions/Firefox/` |
 
 ### نحوه نصب افزونه (بدون نیاز به بسته‌بندی)
 نیازی به زیپ کردن فایل‌ها نیست. مراحل زیر را طی کنید:
@@ -60,14 +60,14 @@
 1. مرورگر را باز کنید و به آدرس `chrome://extensions` (یا `edge://extensions`) بروید.
 2. گزینه **Developer mode** را در گوشه بالا فعال کنید.
 3. روی دکمه **Load unpacked** کلیک کنید.
-4. پوشه مربوطه (مثلاً `DownloadManager/Extensions/Chrome`) را انتخاب کنید.
+4. پوشه مربوطه (مثلاً `DownloadManagerH/DownloadManager/Extensions/Chrome`) را انتخاب کنید.
 
 #### برای فایرفاکس:
 1. به آدرس `about:debugging#/runtime/this-firefox` بروید.
 2. روی **Load Temporary Add-on** کلیک کنید.
-3. فایل `manifest.json` داخل پوشه `DownloadManager/Extensions/Firefox` را انتخاب کنید.
+3. فایل `manifest.json` داخل پوشه `DownloadManagerH/DownloadManager/Extensions/Firefox` را انتخاب کنید.
 
-> **نکته:** افزونه‌ها به‌صورت خودکار با برنامه اصلی روی پورت `9090` ارتباط برقرار می‌کنند.
+> **نکته:** افزونه‌های مرورگر با API محلی برنامه روی پورت پیش‌فرض `24680` ارتباط برقرار می‌کنند. پورت `9090` فقط برای یکپارچه‌سازی TrafficWatch استفاده می‌شود.
 
 ---
 
@@ -128,7 +128,7 @@ DownloadManagerH/
 
 - **[راهنمای یکپارچه‌سازی با TrafficWatch](docs/TRAFFIC_WATCH_INTEGRATION.md)** - راهنمای کامل اتصال به داشبورد مانیتورینگ
 - **[راهنمای افزونه‌های مرورگر](docs/EXTENSIONS_GUIDE.md)** - نصب و پیکربندی افزونه‌های Chrome، Edge و Firefox
-- **[راهنمای سیستم افزونه‌ها](DownloadManager/Services/PluginSystem/README.md)** - آموزش ایجاد افزونه‌های جدید با Named Pipe
-- **[راهنمای کامل افزونه‌های مرورگر](DownloadManager/Extensions/README.md)** - جزئیات نصب و استفاده از افزونه‌ها
+- **[راهنمای سیستم افزونه‌ها](DownloadManagerH/DownloadManager/Services/PluginSystem/README.md)** - آموزش ایجاد افزونه‌های جدید با Named Pipe
+- **[راهنمای کامل افزونه‌های مرورگر](DownloadManagerH/DownloadManager/Extensions/README.md)** - جزئیات نصب و استفاده از افزونه‌ها
 
 </div>

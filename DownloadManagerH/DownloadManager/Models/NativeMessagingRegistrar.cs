@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Win32;
-using System.Reflection;
 using System.Collections.Generic;
 using DownloadManagerH.Models.Logging;
 
@@ -39,12 +38,8 @@ namespace DownloadManagerH.Models
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _configuration = configuration ?? new NativeMessagingConfiguration(logger);
             
-            // Get the current executable path
-            _executablePath = Assembly.GetExecutingAssembly().Location;
-            if (string.IsNullOrEmpty(_executablePath))
-            {
-                _executablePath = Environment.ProcessPath ?? throw new InvalidOperationException("Cannot determine executable path");
-            }
+            // Get the current executable path. Environment.ProcessPath is reliable for single-file publishes.
+            _executablePath = Environment.ProcessPath ?? throw new InvalidOperationException("Cannot determine executable path");
 
             // Create manifests directory next to executable
             var executableDir = Path.GetDirectoryName(_executablePath) ?? throw new InvalidOperationException("Cannot determine executable directory");
